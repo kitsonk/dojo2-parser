@@ -6,11 +6,11 @@ module.exports = function (grunt) {
 	grunt.loadNpmTasks('grunt-contrib-watch');
 	grunt.loadNpmTasks('grunt-ts');
 	grunt.loadNpmTasks('grunt-tslint');
-	grunt.loadNpmTakss('dts-generator');
+	grunt.loadNpmTasks('dts-generator');
 	grunt.loadNpmTasks('intern');
 
 	grunt.initConfig({
-		name: 'dojo-<< package-name >>',
+		name: 'dojo2-parser',
 		all: [ 'src/**/*.ts', 'typings/tsd.d.ts' ],
 		tests: [ 'tests/**/*.ts', 'typings/tsd.d.ts' ],
 

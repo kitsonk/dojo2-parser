@@ -1,10 +1,10 @@
 {
     "compilerOptions": {
         "declaration": false,
-        "module": "camd",
+        "module": "amd",
         "noImplicitAny": true,
         "removeComments": false,
-        "sourceMap": false,
+        "sourceMap": true,
         "target": "es5"
     },
     "filesGlob": [
@@ -17,12 +17,14 @@
         "./intern.ts",
         "./typings/chai/chai.d.ts",
         "./typings/digdug/digdug.d.ts",
+        "./typings/dist/dist.d.ts",
         "./typings/dojo2/dojo.d.ts",
         "./typings/intern/intern.d.ts",
         "./typings/leadfoot/leadfoot.d.ts",
         "./typings/node/node.d.ts",
         "./typings/tsd.d.ts",
         "./unit/all.ts",
+        "./unit/parser.ts",
         "../typings/tsd.d.ts"
     ]
 }
