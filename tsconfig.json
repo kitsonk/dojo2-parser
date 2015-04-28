@@ -4,29 +4,31 @@
         "declaration": false,
         "module": "amd",
         "noImplicitAny": true,
-        "outDir": "dist/",
+        "outDir": "_build/",
         "removeComments": false,
         "sourceMap": true,
         "target": "es5"
     },
     "filesGlob": [
-        "./src/**/*.ts",
         "./typings/tsd.d.ts",
+        "./src/**/*.ts",
         "./tests/**/*.ts"
     ],
     "files": [
-        "./src/parser.ts",
         "./typings/tsd.d.ts",
+        "./src/parser.ts",
         "./tests/functional/all.ts",
         "./tests/intern-local.ts",
         "./tests/intern.ts",
         "./tests/typings/chai/chai.d.ts",
         "./tests/typings/digdug/digdug.d.ts",
+        "./tests/typings/dist/dist.d.ts",
         "./tests/typings/dojo2/dojo.d.ts",
         "./tests/typings/intern/intern.d.ts",
         "./tests/typings/leadfoot/leadfoot.d.ts",
         "./tests/typings/node/node.d.ts",
         "./tests/typings/tsd.d.ts",
-        "./tests/unit/all.ts"
+        "./tests/unit/all.ts",
+        "./tests/unit/parser.ts"
     ]
 }

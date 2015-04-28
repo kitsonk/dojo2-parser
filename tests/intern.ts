@@ -10,9 +10,7 @@ export var proxyUrl = 'http://localhost:9000/';
 // Note that the `build` capability will be filled in with the current commit ID from the Travis CI environment
 // automatically
 export var capabilities = {
-	'selenium-version': '2.45.0',
-	'video-upload-on-pass': false,
-	'max-duration': 300
+	'selenium-version': '2.45.0'
 };
 
 // Browsers to run integration testing against. Note that version numbers must be strings if used with Sauce
@@ -46,8 +44,8 @@ export var useLoader = {
 export var loader = {
 	// Packages that should be registered with the loader in each testing environment
 	packages: [
-		{ name: 'dist', location: 'dist' },
-		{ name: 'tests', location: 'tests' }
+		{ name: 'src', location: '_build/src'},
+		{ name: 'tests', location: '_build/tests' }
 	]
 };
 
@@ -58,4 +56,4 @@ export var suites = [ 'tests/unit/all' ];
 export var functionalSuites = [ 'tests/functional/all' ];
 
 // A regular expression matching URLs to files that should not be included in code coverage analysis
-export var excludeInstrumentation = /^(?:node_modules|bower_components|tests)[\/\\]/;
+export var excludeInstrumentation = /^(?:node_modules|bower_components|_build[\/\\]tests)[\/\\]/;
