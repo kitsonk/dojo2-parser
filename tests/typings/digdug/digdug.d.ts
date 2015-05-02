@@ -1,4 +1,4 @@
-/// <reference path="../dojo2/dojo.d.ts" />
+/// <reference path="../../../typings/dojo/dojo-2.0.d.ts" />
 /// <reference path="../node/node.d.ts" />
 
 declare module digdug {

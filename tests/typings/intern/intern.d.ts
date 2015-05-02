@@ -1,7 +1,7 @@
 /// <reference path="../chai/chai.d.ts" />
 /// <reference path="../digdug/digdug.d.ts" />
 /// <reference path="../leadfoot/leadfoot.d.ts" />
-/// <reference path="../dojo2/dojo.d.ts" />
+/// <reference path="../../../typings/dojo/dojo-2.0.d.ts" />
 
 declare module 'intern' {
 	import main = require('intern/main');

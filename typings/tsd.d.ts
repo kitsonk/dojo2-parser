@@ -1,1 +1,1 @@
-/// <reference path="./dojo2/dojo.d.ts" />
+/// <reference path="./dojo/dojo-2.0.d.ts" />
