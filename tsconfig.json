@@ -16,6 +16,7 @@
     ],
     "files": [
         "./typings/tsd.d.ts",
+        "./src/WeakMap.ts",
         "./src/parser.ts",
         "./tests/functional/all.ts",
         "./tests/intern-local.ts",
@@ -28,6 +29,7 @@
         "./tests/typings/leadfoot/leadfoot.d.ts",
         "./tests/typings/node/node.d.ts",
         "./tests/typings/tsd.d.ts",
+        "./tests/unit/WeakMap.ts",
         "./tests/unit/all.ts",
         "./tests/unit/parser.ts"
     ]
