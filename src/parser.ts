@@ -25,7 +25,7 @@ interface IRegistrationHandle extends core.IHandle {
     Ctor: ParserObjectConstructor;
 }
 
-var parserRegistry = new Registry(null);
+var parserRegistryMap: WeakMap<any, any> = new WeakMap();
 var parserIDMap: { [id: string]: ParserObject } = {};
 var parserNodeMap: WeakMap<any, any> = new WeakMap();
 
@@ -48,6 +48,7 @@ function observervationCallback(observations: MutationRecord[]): void {
         if (observation.type === 'childList') {
             addedNodes = slice.call(observation.addedNodes);
             addedNodes.forEach((node: HTMLElement) => {
+                var parserRegistry = parserRegistryMap.get(node.ownerDocument);
                 var Ctor: ParserObjectConstructor = parserRegistry.match(node);
                 var obj: ParserObject = new Ctor(node);
                 obj.node = node;
@@ -98,6 +99,11 @@ export function register(tagName: string, options: IParserDefinitionOptions): IR
     }
     else {
         throw new SyntaxError('Missing either "Ctor" or "proto" in options.');
+    }
+    var parserRegistry = parserRegistryMap.get(options.doc || document);
+    if (!parserRegistry) {
+        parserRegistry = new Registry();
+        parserRegistryMap.set(options.doc || document, parserRegistry);
     }
     var handle = parserRegistry.register((node: HTMLElement) => {
         if (node.tagName.toLowerCase() === tagName) {
