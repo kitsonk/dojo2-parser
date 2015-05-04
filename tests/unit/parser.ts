@@ -15,8 +15,9 @@ registerSuite({
         var dfd = this.async();
         var watchHandle = parser.watch();
 
-        var TestCtor = function TestCtor(node: HTMLElement) {
+        var TestCtor = function TestCtor(node: HTMLElement, options: any) {
             assert(node);
+            assert.isTrue(options.bar);
         };
         TestCtor.prototype = <ParserTestInterface> {
             'foo': 'bar'
@@ -26,7 +27,9 @@ registerSuite({
             Ctor: TestCtor
         });
 
-        document.body.innerHTML = '<div is="test-div" id="test1"></div><test-div id="test2"></test-div>';
+        document.body.innerHTML = "<div is='test-div' id='test1'" +
+            " data-options='{ \"bar\": true }'></div><test-div id='test2'" +
+            " data-options='{ \"bar\": true }'></test-div>";
 
         var test1 = document.getElementById('test1');
         var test2 = document.getElementById('test2');
