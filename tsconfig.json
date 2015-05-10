@@ -18,19 +18,23 @@
         "./typings/tsd.d.ts",
         "./src/WeakMap.ts",
         "./src/parser.ts",
+        "./src/watcher.ts",
         "./tests/functional/all.ts",
         "./tests/intern-local.ts",
         "./tests/intern.ts",
+        "./tests/jsdom.ts",
         "./tests/typings/chai/chai.d.ts",
         "./tests/typings/digdug/digdug.d.ts",
         "./tests/typings/dist/dist.d.ts",
-        "./tests/typings/dojo2/dojo.d.ts",
+        "./tests/typings/dojo2-parser/dojo2-parser.d.ts",
         "./tests/typings/intern/intern.d.ts",
+        "./tests/typings/jsdom/jsdom.d.ts",
         "./tests/typings/leadfoot/leadfoot.d.ts",
         "./tests/typings/node/node.d.ts",
         "./tests/typings/tsd.d.ts",
         "./tests/unit/WeakMap.ts",
         "./tests/unit/all.ts",
-        "./tests/unit/parser.ts"
+        "./tests/unit/parser.ts",
+        "./tests/unit/watcher.ts"
     ]
 }

@@ -2,6 +2,7 @@ import core = require('dojo/interfaces');
 import has = require('dojo/has');
 import Registry = require('dojo/Registry');
 import Promise = require('dojo/Promise');
+import watcher = require('./watcher');
 import WeakMap = require('./WeakMap');
 
 'use strict';
@@ -42,7 +43,6 @@ var parserNodeMap: WeakMap<any, any> = new WeakMap();
 has.add('dom3-mutation-observer', typeof MutationObserver !== 'undefined');
 
 var slice = Array.prototype.slice;
-var observer: MutationObserver;
 
 /**
  * Take a HTMLElement and instantiate an Object if registered
@@ -97,20 +97,39 @@ function observervationCallback(observations: MutationRecord[]): void {
     });
 }
 
+function watcherCallback(changes: watcher.WatcherRecord[]): void {
+    changes.forEach((change: watcher.WatcherRecord) => {
+        if (change.type === watcher.WatchType.Added) {
+            instantiateParserObject(change.node);
+        }
+        if (change.type === watcher.WatchType.Removed) {
+            // todo
+        }
+    });
+}
+
 class Parser implements parser.IParser<any> {
+    private _observer: MutationObserver;
+    private _watcherHandle: core.IHandle;
     watch(doc: Document = document): core.IHandle {
-        if (has('dom3-mutation-observer') && typeof observer === 'undefined') {
-            observer = new MutationObserver(observervationCallback);
-            observer.observe(doc.body, {
+        if (has('dom3-mutation-observer') && typeof this._observer === 'undefined') {
+            this._observer = new MutationObserver(observervationCallback);
+            this._observer.observe(doc.body, {
                 childList: true,
                 subtree: true
             });
         }
+        else if (!has('dom3-mutation-observer') && typeof this._watcherHandle === 'undefined') {
+            this._watcherHandle = watcher.watch(doc.body, watcherCallback);
+        }
         return {
             remove(): void {
-                if (observer) {
-                    observer.disconnect();
-                    observer = undefined;
+                if (this._observer) {
+                    this._observer.disconnect();
+                    this._observer = undefined;
+                }
+                if (this._watcherHandle) {
+                    this._watcherHandle.remove();
                 }
             }
         };

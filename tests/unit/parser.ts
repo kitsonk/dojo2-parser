@@ -1,6 +1,7 @@
 import assert = require('intern/chai!assert');
 import registerSuite = require('intern!object');
 import parser = require('src/parser');
+import jsdom = require('dojo/has!host-node?../jsdom');
 
 interface ParserTestInterface extends parser.ParserObject {
     foo: any;
@@ -9,11 +10,9 @@ interface ParserTestInterface extends parser.ParserObject {
 registerSuite({
     name: 'parser',
     'basic': function () {
-        if (typeof document === 'undefined') {
-            this.skip('No DOM');
-        }
-        var dfd = this.async();
-        var watchHandle = parser.watch();
+        var doc: Document = typeof document === 'undefined' ? jsdom.jsdom('<html><body></body></html>') : document;
+        var dfd = this.async(250);
+        var watchHandle = parser.watch(doc);
 
         var TestCtor = function TestCtor(node: HTMLElement, options: any) {
             assert(node);
@@ -24,15 +23,19 @@ registerSuite({
         };
 
         var registerHandle = parser.register('test-div', {
-            Ctor: TestCtor
+            Ctor: TestCtor,
+            doc: doc
         });
 
-        document.body.innerHTML = "<div is='test-div' id='test1'" +
+        doc.body.innerHTML = "<div is='test-div' id='test1'" +
             " data-options='{ \"bar\": true }'></div><test-div id='test2'" +
             " data-options='{ \"bar\": true }'></test-div>";
 
-        var test1 = document.getElementById('test1');
-        var test2 = document.getElementById('test2');
+        var test1 = doc.getElementById('test1');
+        var test2 = doc.getElementById('test2');
+
+        /* watching only fires at the end of the turn, therefore need to
+         * complete test asnyc. */
         setTimeout(function () {
             assert.equal((<ParserTestInterface> parser.byId('test1')).foo, 'bar');
             assert.strictEqual(parser.byId('test1').node, test1);
@@ -44,7 +47,8 @@ registerSuite({
 
             watchHandle.remove();
             registerHandle.remove();
+            doc.body.innerHTML = '';
             dfd.resolve();
-        }, 1);
+        }, 100);
     }
 });
