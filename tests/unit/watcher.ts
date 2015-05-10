@@ -4,9 +4,9 @@ import watcher = require('src/watcher');
 import jsdom = require('dojo/has!host-node?../jsdom');
 
 registerSuite({
-    name: 'parser',
+    name: 'watcher',
     'basic': function () {
-        var dfd = this.async(1000);
+        var dfd = this.async(250);
         var doc: Document = typeof document === 'undefined' ? jsdom.jsdom('<html><body></body></html>') : document;
 
         var callback = function (changes: watcher.WatcherRecord[]) {
