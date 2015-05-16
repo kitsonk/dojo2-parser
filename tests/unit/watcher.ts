@@ -1,7 +1,7 @@
 import assert = require('intern/chai!assert');
 import registerSuite = require('intern!object');
 import watcher = require('src/watcher');
-import jsdom = require('dojo/has!host-node?../jsdom');
+import jsdom = require('dojo-core/has!host-node?../jsdom');
 
 registerSuite({
     name: 'watcher',

@@ -4,6 +4,17 @@ import WeakMap = require('./WeakMap');
 
 'use strict';
 
+interface ElementStructure {
+    node: HTMLElement,
+    kids?: ElementStructure[]
+}
+
+interface IteratorCallback {
+    (value: HTMLElement, index?: number, array?: HTMLElement[]|NodeList): ElementStructure;
+}
+
+export let checkInterval: number = 30;
+
 export enum WatchType { Added, Removed }
 export interface WatcherRecord {
     node: HTMLElement,
@@ -12,17 +23,6 @@ export interface WatcherRecord {
 
 export interface WatcherCallback {
     (changes: WatcherRecord[]): void;
-}
-
-export let interval: number = 30;
-
-interface ElementStructure {
-    node: HTMLElement,
-    kids?: ElementStructure[]
-}
-
-interface IteratorCallback {
-    (value: HTMLElement, index?: number, array?: HTMLElement[]|NodeList): ElementStructure;
 }
 
 function clone(target: HTMLElement): ElementStructure {
@@ -212,7 +212,7 @@ function checkChanges(): void {
 }
 
 function startTimer(): void {
-    timer = setTimeout(checkChanges, interval);
+    timer = setTimeout(checkChanges, checkInterval);
 }
 
 export function watch(node: HTMLElement, callback: WatcherCallback): core.IHandle {
