@@ -1,5 +1,5 @@
-/// <reference path="../../../typings/dojo/dojo-2.0.d.ts" />
-/// <reference path="../node/node.d.ts" />
+/// <reference path="../dojo2/dojo.d.ts" />
+/// <reference path="../../../_modules/dojo-core/typings/node/node.d.ts" />
 
 declare module digdug {
 	export interface Handle {

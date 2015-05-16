@@ -44,7 +44,7 @@ export var useLoader = {
 export var loader = {
 	// Packages that should be registered with the loader in each testing environment
 	packages: [
-		{ name: 'dojo', location: '_modules/dojo2' },
+		{ name: 'dojo-core', location: '_modules/dojo-core' },
 		{ name: 'src', location: '_build/src'},
 		{ name: 'tests', location: '_build/tests' }
 	]

@@ -1,6 +1,6 @@
 /// <reference path="../jsdom/jsdom.d.ts" />
 
-declare module 'dojo/has!host-node?../jsdom' {
+declare module 'dojo-core/has!host-node?../jsdom' {
 	import jsdom = require('jsdom');
 	var jd: {
 		jsdom(markup: string, config?: jsdom.Config): Document;
