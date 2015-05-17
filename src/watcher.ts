@@ -1,6 +1,6 @@
-import core = require('dojo/interfaces');
-import nextTick = require('dojo/nextTick');
-import WeakMap = require('./WeakMap');
+import core = require('./interfaces');
+import nextTick from 'dojo-core/nextTick';
+import WeakMap from 'dojo-core/WeakMap';
 
 'use strict';
 

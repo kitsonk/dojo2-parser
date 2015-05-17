@@ -11,12 +11,19 @@
     },
     "filesGlob": [
         "./typings/tsd.d.ts",
+        "./_modules/**/*.d.ts",
         "./src/**/*.ts",
         "./tests/**/*.ts"
     ],
     "files": [
         "./typings/tsd.d.ts",
+        "./_modules/dojo-core/typings/dojo-core/dojo-core-2.0.0-pre.d.ts",
+        "./_modules/dojo-core/typings/node/node.d.ts",
         "./src/Registry.ts",
+        "./src/has.ts",
+        "./src/interfaces.d.ts",
+        "./src/loader.ts",
+        "./src/node.ts",
         "./src/parser.ts",
         "./src/watcher.ts",
         "./tests/functional/all.ts",

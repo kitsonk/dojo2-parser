@@ -1,6 +1,6 @@
 /// <reference path="../jsdom/jsdom.d.ts" />
 
-declare module 'dojo-core/has!host-node?../jsdom' {
+declare module 'src/has!host-node?../jsdom' {
 	import jsdom = require('jsdom');
 	var jd: {
 		jsdom(markup: string, config?: jsdom.Config): Document;
@@ -8,7 +8,7 @@ declare module 'dojo-core/has!host-node?../jsdom' {
 	export = jd;
 }
 
-declare module 'dojo/node!../../node_modules/jsdom/lib/jsdom' {
+declare module 'src/node!../../node_modules/jsdom/lib/jsdom' {
 	import jsdom = require('jsdom');
 	var jd: {
 		jsdom(markup: string, config?: jsdom.Config): Document;

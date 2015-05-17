@@ -1,11 +1,9 @@
-import core = require('dojo/interfaces');
-import has = require('dojo/has');
-import Registry = require('dojo/Registry');
-import Promise = require('dojo/Promise');
+import core = require('./interfaces');
+import has, { add as hasAdd } from 'dojo-core/has';
+import Registry = require('./Registry');
+import Promise from 'dojo-core/Promise';
 import watcher = require('./watcher');
-import WeakMap = require('./WeakMap');
-
-'use strict';
+import WeakMap from 'dojo-core/WeakMap';
 
 declare module parser {
     export interface ParserObject {
@@ -40,7 +38,7 @@ var parserRegistryMap: WeakMap<any, any> = new WeakMap();
 var parserIDMap: { [id: string]: parser.ParserObject } = {};
 var parserNodeMap: WeakMap<any, any> = new WeakMap();
 
-has.add('dom3-mutation-observer', typeof MutationObserver !== 'undefined');
+hasAdd('dom3-mutation-observer', typeof MutationObserver !== 'undefined');
 
 var slice = Array.prototype.slice;
 

@@ -1,5 +1,15 @@
-import lang = require('dojo-core/lang');
-import core = require('dojo-core/interfaces');
+import core = require('./interfaces');
+
+function pullFromArray<T>(haystack: T[], needle: T): T[] {
+	var removed: T[] = [];
+	var i: number = 0;
+
+	while ((i = haystack.indexOf(needle, i)) > -1) {
+		removed.push(haystack.splice(i, 1)[0]);
+	}
+
+	return removed;
+}
 
 module Registry {
 	export interface ITest {
@@ -49,7 +59,7 @@ class Registry<ValueT> {
 		return {
 			remove: function (): void {
 				this.remove = function (): void {};
-				lang.pullFromArray(entries, entry);
+				pullFromArray(entries, entry);
 				test = value = entries = entry = null;
 			}
 		};
