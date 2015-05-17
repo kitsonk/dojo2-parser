@@ -8,6 +8,7 @@
 })(["require", "exports", './global', './has'], function (require, exports) {
     var global_1 = require('./global');
     var has_1 = require('./has');
+    has_1.add('microtasks', (has_1.default('promise') || has_1.default('host-node') || has_1.default('dom-mutationobserver')));
     function executeTask(item) {
         if (item.isActive) {
             item.callback();
@@ -22,6 +23,29 @@
                 if (destructor) {
                     destructor();
                 }
+            }
+        };
+    }
+    // When no mechanism for registering microtasks is exposed by the environment,
+    // microtasks will be queued and then executed in a single macrotask before the other
+    // macrotasks are executed.
+    var checkMicroTaskQueue;
+    var microTasks;
+    if (!has_1.default('microtasks')) {
+        var isMicroTaskQueued = false;
+        microTasks = [];
+        checkMicroTaskQueue = function () {
+            if (!isMicroTaskQueued) {
+                isMicroTaskQueued = true;
+                exports.queueTask(function () {
+                    isMicroTaskQueued = false;
+                    if (microTasks.length) {
+                        var item;
+                        while (item = microTasks.shift()) {
+                            executeTask(item);
+                        }
+                    }
+                });
             }
         };
     }
@@ -58,7 +82,7 @@
                 return setTimeout(executeTask.bind(null, item), 0);
             };
         }
-        return function (callback) {
+        function queueTask(callback) {
             var item = {
                 isActive: true,
                 callback: callback
@@ -67,6 +91,12 @@
             return getQueueHandle(item, destructor && function () {
                 destructor(id);
             });
+        }
+        ;
+        // TODO: Use aspect.before when it is available.
+        return has_1.default('microtasks') ? queueTask : function (callback) {
+            checkMicroTaskQueue();
+            return queueTask(callback);
         };
     })();
     /**
@@ -117,7 +147,10 @@
             };
         }
         else {
-            return exports.queueTask;
+            enqueue = function (item) {
+                checkMicroTaskQueue();
+                microTasks.push(item);
+            };
         }
         return function (callback) {
             var item = {

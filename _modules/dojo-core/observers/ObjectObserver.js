@@ -11,9 +11,10 @@ var __extends = (this && this.__extends) || function (d, b) {
     else if (typeof define === 'function' && define.amd) {
         define(deps, factory);
     }
-})(["require", "exports", '../object', '../has', '../Scheduler'], function (require, exports) {
+})(["require", "exports", '../object', '../has', '../queue', '../Scheduler'], function (require, exports) {
     var object_1 = require('../object');
     var has_1 = require('../has');
+    var queue_1 = require('../queue');
     var Scheduler_1 = require('../Scheduler');
     has_1.add('object-observe', typeof Object.observe === 'function');
     var BaseObjectObserver = (function () {
@@ -104,7 +105,7 @@ var __extends = (this && this.__extends) || function (d, b) {
         function Es5Observer(kwArgs) {
             _super.call(this, kwArgs);
             if (!this.constructor._scheduler) {
-                this.constructor._scheduler = new Scheduler_1.default({ type: 'micro' });
+                this.constructor._scheduler = new Scheduler_1.default({ queueFunction: queue_1.queueMicroTask });
             }
             this.nextTurn = ('nextTurn' in kwArgs) ? kwArgs.nextTurn : true;
             this._descriptors = {};

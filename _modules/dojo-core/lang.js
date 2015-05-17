@@ -195,5 +195,27 @@
         };
     }
     exports.partial = partial;
+    function createHandle(destructor) {
+        return {
+            destroy: function () {
+                this.destroy = function () { };
+                destructor.call(this);
+            }
+        };
+    }
+    exports.createHandle = createHandle;
+    function createCompositeHandle() {
+        var handles = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            handles[_i - 0] = arguments[_i];
+        }
+        return createHandle(function () {
+            for (var _i = 0; _i < handles.length; _i++) {
+                var handle = handles[_i];
+                handle.destroy();
+            }
+        });
+    }
+    exports.createCompositeHandle = createCompositeHandle;
 });
 //# sourceMappingURL=_debug/lang.js.map

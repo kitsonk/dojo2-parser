@@ -7,11 +7,6 @@
     }
 })(["require", "exports", './queue'], function (require, exports) {
     var queue_1 = require('./queue');
-    var typeMap = {
-        animation: queue_1.queueAnimationTask,
-        macro: queue_1.queueTask,
-        micro: queue_1.queueMicroTask
-    };
     function getQueueHandle(item) {
         return {
             destroy: function () {
@@ -24,7 +19,7 @@
     var Scheduler = (function () {
         function Scheduler(kwArgs) {
             this.deferWhileProcessing = (kwArgs && 'deferWhileProcessing' in kwArgs) ? kwArgs.deferWhileProcessing : true;
-            this.type = (kwArgs && kwArgs.type && kwArgs.type in typeMap) ? kwArgs.type : 'macro';
+            this.queueFunction = (kwArgs && kwArgs.queueFunction) ? kwArgs.queueFunction : queue_1.queueTask;
             this._boundDispatch = this._dispatch.bind(this);
             this._isProcessing = false;
             this._queue = [];
@@ -63,7 +58,7 @@
         };
         Scheduler.prototype._schedule = function (item) {
             if (!this._task) {
-                this._task = typeMap[this.type](this._boundDispatch);
+                this._task = this.queueFunction(this._boundDispatch);
             }
             this._queue.push(item);
         };

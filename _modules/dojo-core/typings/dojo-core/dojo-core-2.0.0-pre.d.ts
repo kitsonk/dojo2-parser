@@ -1,4 +1,43 @@
 /// <reference path="../node/node.d.ts" />
+declare module 'dojo-core/interfaces' {
+	export interface Handle {
+		destroy(): void;
+	}
+
+	export interface EventObject {
+	    type: string;
+	}
+
+}
+declare module 'dojo-core/observers/interfaces' {
+	import core = require('dojo-core/interfaces');
+
+	export interface Observer extends core.Handle {
+		observeProperty(...property: string[]): void;
+		removeProperty(...property: string[]): void;
+	    nextTurn?: boolean;
+	    onlyReportObserved?: boolean;
+	}
+
+	export interface PropertyEvent {
+		target: {};
+		name: string;
+	}
+
+}
+declare module 'dojo-core/object' {
+	/**
+	 * Copies the values of all enumerable own properties of one or more source objects to the target object.
+	 * @return The modified target object
+	 */
+	export function assign(target: any, ...sources: any[]): any;
+	/**
+	 * Determines whether two values are the same value.
+	 * @return true if the values are the same; false otherwise
+	 */
+	export function is(value1: any, value2: any): boolean;
+
+}
 declare module 'dojo-core/global' {
 	 const globalObject: any;
 	export default globalObject;
@@ -29,12 +68,6 @@ declare module 'dojo-core/has' {
 	export default function has(feature: string): any;
 
 }
-declare module 'dojo-core/interfaces' {
-	export interface Handle {
-		destroy(): void;
-	}
-
-}
 declare module 'dojo-core/queue' {
 	import { Handle } from 'dojo-core/interfaces';
 	export interface QueueItem {
@@ -48,6 +81,83 @@ declare module 'dojo-core/queue' {
 	 */
 	export let queueAnimationTask: (callback: (...args: any[]) => any) => Handle;
 	export let queueMicroTask: (callback: (...args: any[]) => any) => Handle;
+
+}
+declare module 'dojo-core/Scheduler' {
+	import { Handle } from 'dojo-core/interfaces';
+	import { QueueItem } from 'dojo-core/queue';
+	export interface KwArgs {
+	    deferWhileProcessing?: boolean;
+	    queueFunction?: (callback: (...args: any[]) => any) => Handle;
+	}
+	export default class Scheduler {
+	    protected _boundDispatch: () => void;
+	    protected _deferred: QueueItem[];
+	    protected _isProcessing: boolean;
+	    protected _queue: QueueItem[];
+	    protected _task: Handle;
+	    /**
+	     * Determines whether any callbacks registered during should be added to the current batch (`false`)
+	     * or deferred until the next batch (`true`, default).
+	     */
+	    deferWhileProcessing: boolean;
+	    /**
+	     * Allows users to specify the function that should be used to schedule callbacks.
+	     * If no function is provided, then `queueTask` will be used.
+	     */
+	    queueFunction: (callback: (...args: any[]) => any) => Handle;
+	    protected _defer(callback: (...args: any[]) => void): Handle;
+	    protected _dispatch(): void;
+	    protected _schedule(item: QueueItem): void;
+	    constructor(kwArgs?: KwArgs);
+	    schedule(callback: (...args: any[]) => void): Handle;
+	}
+
+}
+declare module 'dojo-core/lang' {
+	import { PropertyEvent, Observer } from 'dojo-core/observers/interfaces';
+	import { Handle } from 'dojo-core/interfaces';
+	export function copy(kwArgs: CopyArgs): any;
+	export interface CopyArgs {
+	    deep?: boolean;
+	    descriptors?: boolean;
+	    inherited?: boolean;
+	    assignPrototype?: boolean;
+	    target?: any;
+	    sources: any[];
+	}
+	export function create(prototype: {}, ...mixins: {}[]): {};
+	export function duplicate(source: {}): {};
+	export function getPropertyNames(object: {}): string[];
+	export function getPropertyDescriptor(object: Object, property: string): PropertyDescriptor;
+	export function isIdentical(a: any, b: any): boolean;
+	export function lateBind(instance: {}, method: string, ...suppliedArgs: any[]): (...args: any[]) => any;
+	export function observe(kwArgs: ObserveArgs): Observer;
+	export interface ObserveArgs {
+	    listener: (events: PropertyEvent[]) => any;
+	    nextTurn?: boolean;
+	    onlyReportObserved?: boolean;
+	    target: {};
+	}
+	export function partial(targetFunction: (...args: any[]) => any, ...suppliedArgs: any[]): (...args: any[]) => any;
+	export function createHandle(destructor: () => void): Handle;
+	export function createCompositeHandle(...handles: Handle[]): Handle;
+
+}
+declare module 'dojo-core/aspect' {
+	import { Handle } from 'dojo-core/interfaces';
+	export function after(target: any, methodName: string, advice: (originalReturn: any, originalArgs: any[]) => any): Handle;
+	export function around(target: any, methodName: string, advice: (previous: Function) => Function): Handle;
+	export function before(target: any, methodName: string, advice: (...originalArgs: any[]) => any[]): Handle;
+	export function on(target: any, methodName: string, advice: (...originalArgs: any[]) => any): Handle;
+
+}
+declare module 'dojo-core/Evented' {
+	import { Handle, EventObject } from 'dojo-core/interfaces';
+	export default class Evented {
+	    emit(data: EventObject): void;
+	    on(type: string, listener: (event: EventObject) => void): Handle;
+	}
 
 }
 declare module 'dojo-core/nextTick' {
@@ -458,62 +568,6 @@ declare module 'dojo-core/async/timing' {
 	}
 
 }
-declare module 'dojo-core/observers/interfaces' {
-	import core = require('dojo-core/interfaces');
-
-	export interface Observer extends core.Handle {
-		observeProperty(...property: string[]): void;
-		removeProperty(...property: string[]): void;
-	    nextTurn?: boolean;
-	    onlyReportObserved?: boolean;
-	}
-
-	export interface PropertyEvent {
-		target: {};
-		name: string;
-	}
-
-}
-declare module 'dojo-core/object' {
-	/**
-	 * Copies the values of all enumerable own properties of one or more source objects to the target object.
-	 * @return The modified target object
-	 */
-	export function assign(target: any, ...sources: any[]): any;
-	/**
-	 * Determines whether two values are the same value.
-	 * @return true if the values are the same; false otherwise
-	 */
-	export function is(value1: any, value2: any): boolean;
-
-}
-declare module 'dojo-core/lang' {
-	import { PropertyEvent, Observer } from 'dojo-core/observers/interfaces';
-	export function copy(kwArgs: CopyArgs): any;
-	export interface CopyArgs {
-	    deep?: boolean;
-	    descriptors?: boolean;
-	    inherited?: boolean;
-	    assignPrototype?: boolean;
-	    target?: any;
-	    sources: any[];
-	}
-	export function create(prototype: {}, ...mixins: {}[]): {};
-	export function duplicate(source: {}): {};
-	export function getPropertyNames(object: {}): string[];
-	export function getPropertyDescriptor(object: Object, property: string): PropertyDescriptor;
-	export function isIdentical(a: any, b: any): boolean;
-	export function lateBind(instance: {}, method: string, ...suppliedArgs: any[]): (...args: any[]) => any;
-	export function observe(kwArgs: ObserveArgs): Observer;
-	export interface ObserveArgs {
-	    listener: (events: PropertyEvent[]) => any;
-	    nextTurn?: boolean;
-	    onlyReportObserved?: boolean;
-	    target: {};
-	}
-	export function partial(targetFunction: (...args: any[]) => any, ...suppliedArgs: any[]): (...args: any[]) => any;
-
-}
 declare module 'dojo-core/math' {
 	/**
 	 * Returns the hyperbolic arccosine of a number.
@@ -635,6 +689,38 @@ declare module 'dojo-core/math' {
 	 * @return The result
 	 */
 	export function trunc(n: number): number;
+
+}
+declare module 'dojo-core/on' {
+	import { Handle, EventObject } from 'dojo-core/interfaces';
+	import Evented from 'dojo-core/Evented';
+	export interface EventCallback {
+	    (event: EventObject): void;
+	}
+	export interface EventEmitter {
+	    on(event: string, listener: EventCallback): EventEmitter;
+	    removeListener(event: string, listener: EventCallback): EventEmitter;
+	}
+	export interface EventTarget {
+	    accessKey?: string;
+	    addEventListener(event: string, listener: EventCallback, capture?: boolean): void;
+	    removeEventListener(event: string, listener: EventCallback, capture?: boolean): void;
+	}
+	export interface ExtensionEvent {
+	    (target: any, listener: EventCallback, capture?: boolean): Handle;
+	}
+	export function emit(target: EventTarget, event: EventObject): boolean;
+	export function emit(target: EventEmitter, event: EventObject): boolean;
+	export function emit(target: Evented, event: EventObject): boolean;
+	export default function on(target: EventTarget, type: string, listener: EventCallback, capture?: boolean): Handle;
+	export default function on(target: EventTarget, type: ExtensionEvent, listener: EventCallback, capture?: boolean): Handle;
+	export default function on(target: EventTarget, type: (string | ExtensionEvent)[], listener: EventCallback, capture?: boolean): Handle;
+	export default function on(target: EventEmitter, type: string, listener: EventCallback): Handle;
+	export default function on(target: EventEmitter, type: ExtensionEvent, listener: EventCallback): Handle;
+	export default function on(target: EventEmitter, type: (string | ExtensionEvent)[], listener: EventCallback): Handle;
+	export default function on(target: Evented, type: string, listener: EventCallback): Handle;
+	export default function on(target: Evented, type: ExtensionEvent, listener: EventCallback): Handle;
+	export default function on(target: Evented, type: (string | ExtensionEvent)[], listener: EventCallback): Handle;
 
 }
 declare module 'dojo-core/streams/ReadableStreamReader' {
