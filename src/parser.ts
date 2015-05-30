@@ -1,57 +1,52 @@
-import core = require('./interfaces');
+import { Handle } from 'dojo-core/interfaces';
 import has, { add as hasAdd } from 'dojo-core/has';
-import Registry = require('./Registry');
+import Registry from './Registry';
 import Promise from 'dojo-core/Promise';
-import watcher = require('./watcher');
+import domWatch, { WatcherRecord, WatchType } from './watcher';
 import WeakMap from 'dojo-core/WeakMap';
 
-declare module parser {
-    export interface ParserObject {
-        node: HTMLElement;
-        id: string;
-    }
-    export interface ParserObjectConstructor {
-        new (node?: HTMLElement, options?: any): ParserObject;
-        prototype: ParserObject;
-    }
-
-    export interface IParserDefinitionOptions {
-        proto?: {};
-        Ctor?: Function;
-        doc?: Document;
-    }
-
-    export interface IRegistrationHandle extends core.IHandle {
-        Ctor: parser.ParserObjectConstructor;
-    }
-
-    export interface IParser<T> {
-        watch(doc?: Document): core.IHandle;
-        register(tagName: string, options: parser.IParserDefinitionOptions): parser.IRegistrationHandle;
-        parse(doc?: Document): Promise<any>;
-        byId(id: string): T;
-        byNode(node: HTMLElement): T;
-    }
-}
-
-var parserRegistryMap: WeakMap<any, any> = new WeakMap();
-var parserIDMap: { [id: string]: parser.ParserObject } = {};
-var parserNodeMap: WeakMap<any, any> = new WeakMap();
-
+/* move to dojo-parser/has */
 hasAdd('dom3-mutation-observer', typeof MutationObserver !== 'undefined');
 
-var slice = Array.prototype.slice;
+export interface ParserObject {
+    node: HTMLElement;
+    id: string;
+}
+export interface ParserObjectConstructor {
+    new (node?: HTMLElement, options?: any): ParserObject;
+    prototype: ParserObject;
+}
+
+export interface ParserDefinitionOptions {
+    proto?: {};
+    Ctor?: ParserObjectConstructor;
+    doc?: Document;
+}
+
+export interface RegistrationHandle extends Handle {
+    Ctor: ParserObjectConstructor;
+}
+
+export type ParserResults = ParserObject[];
+
+const slice = Array.prototype.slice;
+
+const parserRegistryMap: WeakMap<any, any> = new WeakMap();
+const parserNodeMap: WeakMap<any, any> = new WeakMap();
+let parserIDMap: { [id: string]: ParserObject } = {};
 
 /**
- * Take a HTMLElement and instantiate an Object if registered
+ * Take a HTMLElement and instantiate an Object if there is a match in the
+ * registry and the Object doesn't appear to be instantiated yet.
  */
-function instantiateParserObject(node: HTMLElement): void {
-    var Ctor: parser.ParserObjectConstructor;
-    var obj: parser.ParserObject;
-    var optionsString: string;
-    var options: {};
-    var parserRegistry = parserRegistryMap.get(node.ownerDocument);
-    if (parserRegistry) {
+function instantiateParserObject(node: HTMLElement): ParserObject {
+    const parserRegistry = parserRegistryMap.get(node.ownerDocument);
+    let Ctor: ParserObjectConstructor;
+    let obj: ParserObject = parserNodeMap.get(node);
+    let optionsString: string;
+    let options: {};
+
+    if (parserRegistry && !obj) {
         Ctor = parserRegistry.match(node);
         if (Ctor) {
             optionsString = node.getAttribute('data-options');
@@ -74,12 +69,29 @@ function instantiateParserObject(node: HTMLElement): void {
             }
             parserNodeMap.set(node, obj);
         }
+        return obj;
+    }
+    return undefined;
+}
+
+/**
+ * Determine if a parser object is in either of the maps and remove it, allowing
+ * Garbage Collection to potentially occur for the object and the associated DOM
+ * node.
+ */
+function dereferenceParserObject(obj: ParserObject): void {
+    if (obj.id && obj.id in parserIDMap) {
+        delete parserIDMap[obj.id];
+    }
+    if (obj.node) {
+        parserNodeMap.delete(obj.node);
+        obj.node = undefined;
     }
 }
 
 function observervationCallback(observations: MutationRecord[]): void {
-    var addedNodes: HTMLElement[];
-    var removedNodes: HTMLElement[];
+    let addedNodes: HTMLElement[];
+    let removedNodes: HTMLElement[];
     observations.forEach((observation: MutationRecord) => {
         if (observation.type === 'childList') {
             addedNodes = slice.call(observation.addedNodes);
@@ -87,7 +99,7 @@ function observervationCallback(observations: MutationRecord[]): void {
             removedNodes = slice.call(observation.removedNodes);
             removedNodes.forEach((node: HTMLElement) => {
                 if (node.nodeType === 1) {
-                    console.log('remove', node.tagName.toLowerCase(), node.getAttribute('is'));
+                    dereferenceParserObject(byNode(node));
                 }
             });
         }
@@ -95,89 +107,119 @@ function observervationCallback(observations: MutationRecord[]): void {
     });
 }
 
-function watcherCallback(changes: watcher.WatcherRecord[]): void {
-    changes.forEach((change: watcher.WatcherRecord) => {
-        if (change.type === watcher.WatchType.Added) {
+let watcherCallback = function watcherCallback(changes: WatcherRecord[]): void {
+    changes.forEach(function (change: WatcherRecord) {
+        if (change.type === WatchType.Added) {
             instantiateParserObject(change.node);
         }
-        if (change.type === watcher.WatchType.Removed) {
-            // todo
+        if (change.type === WatchType.Removed) {
+            dereferenceParserObject(byNode(change.node));
         }
     });
+};
+
+let observer: MutationObserver;
+let watcherHandle: Handle;
+
+export function watch(root: HTMLElement|Document = document): Handle {
+    if ('body' in root) {
+        root = (<Document> root).body;
+    }
+    if (has('dom3-mutation-observer') && typeof observer === 'undefined') {
+        observer = new MutationObserver(observervationCallback);
+        observer.observe(root, {
+            childList: true,
+            subtree: true
+        });
+    }
+    else if (!has('dom3-mutation-observer') && typeof watcherHandle === 'undefined') {
+        watcherHandle = domWatch(<HTMLElement> root, watcherCallback);
+    }
+    return {
+        destroy(): void {
+            if (observer) {
+                observer.disconnect();
+                observer = undefined;
+            }
+            if (watcherHandle) {
+                watcherHandle.destroy();
+            }
+        }
+    };
 }
 
-class Parser implements parser.IParser<any> {
-    private _observer: MutationObserver;
-    private _watcherHandle: core.IHandle;
-    watch(doc: Document = document): core.IHandle {
-        if (has('dom3-mutation-observer') && typeof this._observer === 'undefined') {
-            this._observer = new MutationObserver(observervationCallback);
-            this._observer.observe(doc.body, {
-                childList: true,
-                subtree: true
-            });
-        }
-        else if (!has('dom3-mutation-observer') && typeof this._watcherHandle === 'undefined') {
-            this._watcherHandle = watcher.watch(doc.body, watcherCallback);
-        }
-        return {
-            remove(): void {
-                if (this._observer) {
-                    this._observer.disconnect();
-                    this._observer = undefined;
-                }
-                if (this._watcherHandle) {
-                    this._watcherHandle.remove();
-                }
-            }
-        };
+export function register(tagName: string, options: ParserDefinitionOptions): RegistrationHandle {
+    tagName = tagName && tagName.toLowerCase();
+    let Ctor: Function;
+    if (!options.Ctor && options.proto) {
+        Ctor = function ParserObject() { };
+        Ctor.prototype = <ParserObject> options.proto;
     }
-    register(tagName: string, options: parser.IParserDefinitionOptions): parser.IRegistrationHandle {
-        tagName = tagName && tagName.toLowerCase();
-        var Ctor: Function;
-        if (!options.Ctor && options.proto) {
-            Ctor = function ParserObject() { };
-            Ctor.prototype = <parser.ParserObject> options.proto;
+    else if (options.Ctor) {
+        Ctor = options.Ctor;
+    }
+    else {
+        throw new SyntaxError('Missing either "Ctor" or "proto" in options.');
+    }
+    let parserRegistry = parserRegistryMap.get(options.doc || document);
+    if (!parserRegistry) {
+        parserRegistry = new Registry(null);
+        parserRegistryMap.set(options.doc || document, parserRegistry);
+    }
+    let handle = parserRegistry.register(function (node: HTMLElement) {
+        if (node.tagName.toLowerCase() === tagName) {
+            return true;
         }
-        else if (options.Ctor) {
-            Ctor = options.Ctor;
+        let attrIs: string = node.getAttribute('is');
+        if (attrIs && attrIs.toLowerCase() === tagName) {
+            return true;
         }
-        else {
-            throw new SyntaxError('Missing either "Ctor" or "proto" in options.');
-        }
-        var parserRegistry = parserRegistryMap.get(options.doc || document);
-        if (!parserRegistry) {
-            parserRegistry = new Registry(null);
-            parserRegistryMap.set(options.doc || document, parserRegistry);
-        }
-        var handle = parserRegistry.register((node: HTMLElement) => {
-            if (node.tagName.toLowerCase() === tagName) {
-                return true;
-            }
-            var attrIs: string = node.getAttribute('is');
-            if (attrIs && attrIs.toLowerCase() === tagName) {
-                return true;
-            }
-        }, Ctor);
+    }, Ctor);
 
-        return {
-            remove(): void {
-                handle.remove();
-            },
-            Ctor: <parser.ParserObjectConstructor> Ctor
-        };
-    }
-    parse(doc: Document = document): Promise<any> {
-        return new Promise(function () { });
-    }
-    byId(id: string): any {
-        return parserIDMap[id];
-    }
-    byNode(node: HTMLElement): any {
-        return parserNodeMap.get(node);
-    }
+    return {
+        destroy(): void {
+            handle.destroy();
+        },
+        Ctor: <ParserObjectConstructor> Ctor
+    };
 }
 
-var parser = new Parser();
+export function byId(id: string): ParserObject {
+    return parserIDMap[id];
+}
 
-export = parser;
+export function byNode(node: HTMLElement): ParserObject {
+    return parserNodeMap.get(node);
+}
+
+export function removeObject(obj: ParserObject): void {
+    dereferenceParserObject(obj);
+}
+
+interface ParserConfig {
+    [tagName: string]: string;
+}
+
+export interface ParserOptions {
+    root?: HTMLElement|Document;
+    config?: ParserConfig;
+}
+
+export default function parse(options?: ParserOptions): Promise<ParserObject[]> {
+    let root = options && options.root || document;
+    if ('body' in root) {
+        root = (<Document> root).body;
+    }
+    let results: ParserObject[] = [];
+    const promise: Promise<ParserObject[]> = new Promise<ParserObject[]>(function (resolve: (value?: ParserObject[]) => void, reject: (reason?: any) => void) {
+        const elements: HTMLElement[] = Array.prototype.slice.call(root.getElementsByTagName('*'));
+        elements.filter((node: HTMLElement) => node.nodeType === 1).forEach(function (node: HTMLElement) {
+            let parserObject = instantiateParserObject(node);
+            if (parserObject) {
+                results.push(parserObject);
+            }
+        });
+        resolve(results);
+    });
+    return promise;
+}
