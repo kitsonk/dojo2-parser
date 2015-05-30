@@ -19,15 +19,15 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     var Shim;
     (function (Shim) {
         var DELETED = {};
+        function getUID() {
+            return Math.floor(Math.random() * 100000000);
+        }
         var generateName = (function () {
             var startId = Math.floor(Date.now() % 100000000);
             return function generateName() {
                 return '__wm' + getUID() + (startId++ + '__');
             };
         })();
-        function getUID() {
-            return Math.floor(Math.random() * 100000000);
-        }
         var WeakMap = (function () {
             function WeakMap(iterable) {
                 Object.defineProperty(this, '_name', {

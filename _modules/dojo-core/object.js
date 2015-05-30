@@ -19,13 +19,13 @@
             throw new TypeError('Cannot convert first argument to object');
         }
         target = Object(target);
-        for (var i = 0, length_1 = sources.length, source = void 0; i < length_1; i++) {
-            source = sources[i];
+        for (var _a = 0; _a < sources.length; _a++) {
+            var source = sources[_a];
             if (source) {
                 source = Object(source);
                 var keys = Object.keys(source);
-                for (var j = 0, keysLength = keys.length, key = void 0; j < keysLength; j++) {
-                    key = keys[j];
+                for (var _b = 0; _b < keys.length; _b++) {
+                    var key = keys[_b];
                     target[key] = source[key];
                 }
             }

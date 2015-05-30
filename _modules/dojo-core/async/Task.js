@@ -50,7 +50,7 @@ var __extends = (this && this.__extends) || function (d, b) {
             return task;
         };
         /**
-         * Propogates cancelation down through a Task tree. The Task's state is immediately set to canceled. If a Thenable
+         * Propagates cancelation down through a Task tree. The Task's state is immediately set to canceled. If a Thenable
          * finally task was passed in, it is resolved before calling this Task's finally callback; otherwise, this Task's
          * finally callback is immediately executed. `_cancel` is called for each child Task, passing in the value returned
          * by this Task's finally callback or a Promise chain that will eventually resolve to that value.
@@ -78,7 +78,7 @@ var __extends = (this && this.__extends) || function (d, b) {
             });
         };
         /**
-         * Immediately cancel this task if it has not already resolved. This Task and any descendants are synchronously set
+         * Immediately cancels this task if it has not already resolved. This Task and any descendants are synchronously set
          * to the Canceled state and any `finally` added downstream from the canceled Task are invoked.
          */
         Task.prototype.cancel = function () {

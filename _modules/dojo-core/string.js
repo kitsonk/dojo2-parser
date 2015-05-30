@@ -212,6 +212,38 @@
     }
     exports.padStart = padStart;
     /**
+     * A tag function for template strings to get the template string's raw string form.
+     * @param callSite Call site object (or a template string in TypeScript, which will transpile to one)
+     * @param substitutions Values to substitute within the template string (TypeScript will generate these automatically)
+     * @return String containing the raw template string with variables substituted
+     *
+     * @example
+     * // Within TypeScript; logs 'The answer is:\\n42'
+     * let answer = 42;
+     * console.log(string.raw`The answer is:\n${answer}`);
+     *
+     * @example
+     * // The same example as above, but directly specifying a JavaScript object and substitution
+     * console.log(string.raw({ raw: [ 'The answer is:\\n', '' ] }, 42));
+     */
+    function raw(callSite) {
+        var substitutions = [];
+        for (var _i = 1; _i < arguments.length; _i++) {
+            substitutions[_i - 1] = arguments[_i];
+        }
+        var rawStrings = callSite.raw;
+        var result = '';
+        var numSubstitutions = substitutions.length;
+        if (callSite == null || callSite.raw == null) {
+            throw new TypeError('string.raw requires a valid callSite object with a raw value');
+        }
+        for (var i = 0, length_1 = rawStrings.length; i < length_1; i++) {
+            result += rawStrings[i] + (i < numSubstitutions && i < length_1 - 1 ? substitutions[i] : '');
+        }
+        return result;
+    }
+    exports.raw = raw;
+    /**
      * Returns a string containing the given string repeated the specified number of times.
      * @param text The string to repeat
      * @param count The number of times to repeat the string

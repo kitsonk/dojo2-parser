@@ -8,7 +8,6 @@
 })(["require", "exports", './global', './has'], function (require, exports) {
     var global_1 = require('./global');
     var has_1 = require('./has');
-    has_1.add('microtasks', (has_1.default('promise') || has_1.default('host-node') || has_1.default('dom-mutationobserver')));
     function executeTask(item) {
         if (item.isActive) {
             item.callback();
@@ -26,9 +25,8 @@
             }
         };
     }
-    // When no mechanism for registering microtasks is exposed by the environment,
-    // microtasks will be queued and then executed in a single macrotask before the other
-    // macrotasks are executed.
+    // When no mechanism for registering microtasks is exposed by the environment, microtasks will
+    // be queued and then executed in a single macrotask before the other macrotasks are executed.
     var checkMicroTaskQueue;
     var microTasks;
     if (!has_1.default('microtasks')) {
@@ -49,11 +47,16 @@
             }
         };
     }
+    /**
+     * Schedules a callback to the macrotask queue.
+     *
+     * @param callback the function to be queued and later executed.
+     * @returns An object with a `destroy` method that, when called, prevents the registered callback from executing.
+     */
     exports.queueTask = (function () {
-        var enqueue;
         var destructor;
-        // Since the IE implementation of `setImmediate` is not flawless, we will test for
-        // `postMessage` first.
+        var enqueue;
+        // Since the IE implementation of `setImmediate` is not flawless, we will test for `postMessage` first.
         if (has_1.default('postmessage')) {
             var queue = [];
             global_1.default.addEventListener('message', function (event) {
@@ -100,14 +103,19 @@
         };
     })();
     /**
+     * Schedules an animation task with `window.requestAnimationFrame` if it exists, or with `queueTask` otherwise.
+     *
      * Since requestAnimationFrame's behavior does not match that expected from `queueTask`, it is not used there.
      * However, at times it makes more sense to delegate to requestAnimationFrame; hence the following method.
+     *
+     * @param callback the function to be queued and later executed.
+     * @returns An object with a `destroy` method that, when called, prevents the registered callback from executing.
      */
     exports.queueAnimationTask = (function () {
         if (!has_1.default('raf')) {
             return exports.queueTask;
         }
-        return function (callback) {
+        function queueAnimationTask(callback) {
             var item = {
                 isActive: true,
                 callback: callback
@@ -116,28 +124,45 @@
             return getQueueHandle(item, function () {
                 cancelAnimationFrame(rafId);
             });
+        }
+        // TODO: Use aspect.before when it is available.
+        return has_1.default('microtasks') ? queueAnimationTask : function (callback) {
+            checkMicroTaskQueue();
+            return queueAnimationTask(callback);
         };
     })();
+    /**
+     * Schedules a callback to the microtask queue.
+     *
+     * Any callbacks registered with `queueMicroTask` will be executed before the next macrotask. If no native
+     * mechanism for scheduling macrotasks is exposed, then any callbacks will be fired before any macrotask
+     * registered with `queueTask` or `queueAnimationTask`.
+     *
+     * @param callback the function to be queued and later executed.
+     * @returns An object with a `destroy` method that, when called, prevents the registered callback from executing.
+     */
     exports.queueMicroTask = (function () {
         var enqueue;
-        if (has_1.default('promise')) {
-            enqueue = function (item) {
-                global_1.default.Promise.resolve(item).then(executeTask);
-            };
-        }
-        else if (has_1.default('host-node')) {
+        if (has_1.default('host-node')) {
             enqueue = function (item) {
                 global_1.default.process.nextTick(executeTask.bind(null, item));
             };
         }
+        else if (has_1.default('promise')) {
+            enqueue = function (item) {
+                global_1.default.Promise.resolve(item).then(executeTask);
+            };
+        }
         else if (has_1.default('dom-mutationobserver')) {
             var HostMutationObserver = global_1.default.MutationObserver || global_1.default.WebKitMutationObserver;
-            var queue = [];
             var node = document.createElement('div');
+            var queue = [];
             var observer = new HostMutationObserver(function () {
-                var item = queue.length && queue.shift();
-                if (item && item.isActive) {
-                    item.callback();
+                while (queue.length > 0) {
+                    var item = queue.shift();
+                    if (item && item.isActive) {
+                        item.callback();
+                    }
                 }
             });
             observer.observe(node, { attributes: true });

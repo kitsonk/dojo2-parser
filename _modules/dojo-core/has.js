@@ -65,6 +65,9 @@
     add('dom-mutationobserver', function () {
         return has('host-browser') && Boolean(global_1.default.MutationObserver || global_1.default.WebKitMutationObserver);
     });
+    add('microtasks', function () {
+        return has('promise') || has('host-node') || has('dom-mutationobserver');
+    });
     add('object-observe', typeof Object.observe === 'function');
     add('postmessage', typeof postMessage === 'function');
     add('promise', typeof global_1.default.Promise !== 'undefined');

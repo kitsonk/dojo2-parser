@@ -1,18 +1,123 @@
-/// <reference path="../node/node.d.ts" />
 declare module 'dojo-core/interfaces' {
-	export interface Handle {
-		destroy(): void;
-	}
-
 	export interface EventObject {
 	    type: string;
 	}
 
+	export interface Handle {
+		destroy(): void;
+	}
+
+	export interface Hash<T> {
+		[ key: string ]: T;
+	}
+
+}
+declare module 'dojo-core/DateObject' {
+	export interface KwArgs {
+	    dayOfMonth?: number;
+	    hours?: number;
+	    milliseconds?: number;
+	    minutes?: number;
+	    month: number;
+	    seconds?: number;
+	    year: number;
+	}
+	export interface OperationKwArgs {
+	    days?: number;
+	    hours?: number;
+	    milliseconds?: number;
+	    minutes?: number;
+	    months?: number;
+	    seconds?: number;
+	    years?: number;
+	}
+	/**
+	 * The properties of a complete date
+	 */
+	export interface DateProperties {
+	    dayOfMonth: number;
+	    dayOfWeek: number;
+	    daysInMonth: number;
+	    hours: number;
+	    isLeapYear: boolean;
+	    milliseconds: number;
+	    minutes: number;
+	    month: number;
+	    seconds: number;
+	    year: number;
+	}
+	export default class DateObject implements DateProperties {
+	    static parse(string: string): DateObject;
+	    static now(): DateObject;
+	    private _date;
+	    utc: DateProperties;
+	    constructor(value: number);
+	    constructor(value: string);
+	    constructor(value: Date);
+	    constructor(value: KwArgs);
+	    constructor();
+	    isLeapYear: boolean;
+	    daysInMonth: number;
+	    year: number;
+	    month: number;
+	    dayOfMonth: number;
+	    hours: number;
+	    minutes: number;
+	    seconds: number;
+	    milliseconds: number;
+	    time: number;
+	    dayOfWeek: number;
+	    timezoneOffset: number;
+	    add(value: number): DateObject;
+	    add(value: OperationKwArgs): DateObject;
+	    compare(value: DateObject): number;
+	    compareDate(value: KwArgs): number;
+	    compareTime(value: KwArgs): number;
+	    toString(): string;
+	    toDateString(): string;
+	    toTimeString(): string;
+	    toLocaleString(): string;
+	    toLocaleDateString(): string;
+	    toLocaleTimeString(): string;
+	    toISOString(): string;
+	    toJSON(key?: any): string;
+	    valueOf(): number;
+	}
+
+}
+declare module 'dojo-core/global' {
+	 const globalObject: any;
+	export default globalObject;
+
+}
+declare module 'dojo-core/has' {
+	import { Hash } from 'dojo-core/interfaces';
+	export const cache: Hash<any>;
+	/**
+	 * Register a new test for a named feature.
+	 *
+	 * @example
+	 * has.add('dom-addeventlistener', !!document.addEventListener);
+	 *
+	 * @example
+	 * has.add('touch-events', function () {
+	 *    return 'ontouchstart' in document
+	 * });
+	 */
+	export function add(feature: string, value: any, overwrite?: boolean): void;
+	/**
+	 * Return the current value of a named feature.
+	 *
+	 * @param feature The name (if a string) or identifier (if an integer) of the feature to test.
+	 * @return The value of a given feature test
+	 */
+	export default function has(feature: string): any;
+
 }
 declare module 'dojo-core/observers/interfaces' {
-	import core = require('dojo-core/interfaces');
+	import { Handle } from 'dojo-core/interfaces';
 
-	export interface Observer extends core.Handle {
+	export interface Observer extends Handle {
 		observeProperty(...property: string[]): void;
 		removeProperty(...property: string[]): void;
 	    nextTurn?: boolean;
@@ -38,48 +143,39 @@ declare module 'dojo-core/object' {
 	export function is(value1: any, value2: any): boolean;
 
 }
-declare module 'dojo-core/global' {
-	 const globalObject: any;
-	export default globalObject;
-
-}
-declare module 'dojo-core/has' {
-	export let cache: {
-	    [feature: string]: any;
-	};
-	/**
-	 * Register a new test for a named feature.
-	 *
-	 * @example
-	 * has.add('dom-addeventlistener', !!document.addEventListener);
-	 *
-	 * @example
-	 * has.add('touch-events', function () {
-	 *    return 'ontouchstart' in document
-	 * });
-	 */
-	export function add(feature: string, value: any, overwrite?: boolean): void;
-	/**
-	 * Return the current value of a named feature.
-	 *
-	 * @param feature The name (if a string) or identifier (if an integer) of the feature to test.
-	 * @return The value of a given feature test
-	 */
-	export default function has(feature: string): any;
-
-}
 declare module 'dojo-core/queue' {
 	import { Handle } from 'dojo-core/interfaces';
 	export interface QueueItem {
 	    isActive: boolean;
 	    callback: (...args: any[]) => any;
 	}
-	export let queueTask: (callback: (...args: any[]) => any) => Handle;
 	/**
+	 * Schedules a callback to the macrotask queue.
+	 *
+	 * @param callback the function to be queued and later executed.
+	 * @returns An object with a `destroy` method that, when called, prevents the registered callback from executing.
+	 */
+	export const queueTask: (callback: (...args: any[]) => any) => Handle;
+	/**
+	 * Schedules an animation task with `window.requestAnimationFrame` if it exists, or with `queueTask` otherwise.
+	 *
 	 * Since requestAnimationFrame's behavior does not match that expected from `queueTask`, it is not used there.
 	 * However, at times it makes more sense to delegate to requestAnimationFrame; hence the following method.
+	 *
+	 * @param callback the function to be queued and later executed.
+	 * @returns An object with a `destroy` method that, when called, prevents the registered callback from executing.
 	 */
-	export let queueAnimationTask: (callback: (...args: any[]) => any) => Handle;
+	export const queueAnimationTask: (callback: (...args: any[]) => any) => Handle;
+	/**
+	 * Schedules a callback to the microtask queue.
+	 *
+	 * Any callbacks registered with `queueMicroTask` will be executed before the next macrotask. If no native
+	 * mechanism for scheduling macrotasks is exposed, then any callbacks will be fired before any macrotask
+	 * registered with `queueTask` or `queueAnimationTask`.
+	 *
+	 * @param callback the function to be queued and later executed.
+	 * @returns An object with a `destroy` method that, when called, prevents the registered callback from executing.
+	 */
 	export let queueMicroTask: (callback: (...args: any[]) => any) => Handle;
 
 }
@@ -115,8 +211,8 @@ declare module 'dojo-core/Scheduler' {
 
 }
 declare module 'dojo-core/lang' {
-	import { PropertyEvent, Observer } from 'dojo-core/observers/interfaces';
 	import { Handle } from 'dojo-core/interfaces';
+	import { PropertyEvent, Observer } from 'dojo-core/observers/interfaces';
 	export function copy(kwArgs: CopyArgs): any;
 	export interface CopyArgs {
 	    deep?: boolean;
@@ -146,36 +242,73 @@ declare module 'dojo-core/lang' {
 }
 declare module 'dojo-core/aspect' {
 	import { Handle } from 'dojo-core/interfaces';
-	export function after(target: any, methodName: string, advice: (originalReturn: any, originalArgs: any[]) => any): Handle;
+	/**
+	 * Attaches "after" advice to be executed after the original method.
+	 * The advising function will receive the original method's return value and arguments object.
+	 * The value it returns will be returned from the method when it is called (even if the return value is undefined).
+	 * @param target Object whose method will be aspected
+	 * @param methodName Name of method to aspect
+	 * @param advice Advising function which will receive the original method's return value and arguments object
+	 * @return A handle which will remove the aspect when destroy is called
+	 */
+	export function after(target: any, methodName: string, advice: (originalReturn: any, originalArgs: IArguments) => any): Handle;
+	/**
+	 * Attaches "around" advice around the original method.
+	 * @param target Object whose method will be aspected
+	 * @param methodName Name of method to aspect
+	 * @param advice Advising function which will receive the original function
+	 * @return A handle which will remove the aspect when destroy is called
+	 */
 	export function around(target: any, methodName: string, advice: (previous: Function) => Function): Handle;
+	/**
+	 * Attaches "before" advice to be executed before the original method.
+	 * @param target Object whose method will be aspected
+	 * @param methodName Name of method to aspect
+	 * @param advice Advising function which will receive the same arguments as the original, and may return new arguments
+	 * @return A handle which will remove the aspect when destroy is called
+	 */
 	export function before(target: any, methodName: string, advice: (...originalArgs: any[]) => any[]): Handle;
+	/**
+	 * Attaches advice to be executed after the original method.
+	 * The advising function will receive the same arguments as the original method.
+	 * The value it returns will be returned from the method when it is called *unless* its return value is undefined.
+	 * @param target Object whose method will be aspected
+	 * @param methodName Name of method to aspect
+	 * @param advice Advising function which will receive the same arguments as the original method
+	 * @return A handle which will remove the aspect when destroy is called
+	 */
 	export function on(target: any, methodName: string, advice: (...originalArgs: any[]) => any): Handle;
 
 }
 declare module 'dojo-core/Evented' {
 	import { Handle, EventObject } from 'dojo-core/interfaces';
 	export default class Evented {
+	    /**
+	     * Emits an event, firing listeners registered for it.
+	     * @param event The event object to emit
+	     */
 	    emit(data: EventObject): void;
+	    /**
+	     * Listens for an event, calling the listener whenever the event fires.
+	     * @param type Event type to listen for
+	     * @param listener Callback to handle the event when it fires
+	     * @return A handle which will remove the listener when destroy is called
+	     */
 	    on(type: string, listener: (event: EventObject) => void): Handle;
 	}
 
 }
-declare module 'dojo-core/nextTick' {
-	import { Handle } from 'dojo-core/interfaces'; let nextTick: (callback: () => void) => Handle;
-	export default nextTick;
-
-}
 declare module 'dojo-core/Promise' {
-	/**
-	 * Return true if a given value has a `then` method.
-	 */
-	export function isThenable(value: any): boolean;
 	/**
 	 * Executor is the interface for functions used to initialize a Promise.
 	 */
 	export interface Executor<T> {
 	    (resolve: (value?: T | Thenable<T>) => void, reject: (reason?: any) => void): void;
 	}
+	/**
+	 * Returns true if a given value has a `then` method.
+	 */
+	export function isThenable(value: any): boolean;
 	/**
 	 * PromiseShim is an implementation of the ES2015 Promise specification.
 	 *
@@ -276,7 +409,7 @@ declare module 'dojo-core/Promise' {
 	    static resolve(): Promise<void>;
 	    static resolve<T>(value: (T | Thenable<T>)): Promise<T>;
 	    /**
-	     * Copy another Promise, taking on its inner state.
+	     * Copies another Promise, taking on its inner state.
 	     */
 	    protected static copy<U>(other: Promise<U>): Promise<U>;
 	    /**
@@ -461,14 +594,14 @@ declare module 'dojo-core/async/Task' {
 	     */
 	    private _finally;
 	    /**
-	     * Propogates cancelation down through a Task tree. The Task's state is immediately set to canceled. If a Thenable
+	     * Propagates cancelation down through a Task tree. The Task's state is immediately set to canceled. If a Thenable
 	     * finally task was passed in, it is resolved before calling this Task's finally callback; otherwise, this Task's
 	     * finally callback is immediately executed. `_cancel` is called for each child Task, passing in the value returned
 	     * by this Task's finally callback or a Promise chain that will eventually resolve to that value.
 	     */
 	    private _cancel(finallyTask?);
 	    /**
-	     * Immediately cancel this task if it has not already resolved. This Task and any descendants are synchronously set
+	     * Immediately cancels this task if it has not already resolved. This Task and any descendants are synchronously set
 	     * to the Canceled state and any `finally` added downstream from the canceled Task are invoked.
 	     */
 	    cancel(): void;
@@ -709,9 +842,23 @@ declare module 'dojo-core/on' {
 	export interface ExtensionEvent {
 	    (target: any, listener: EventCallback, capture?: boolean): Handle;
 	}
+	/**
+	 * Provides a normalized mechanism for dispatching events for event emitters, Evented objects, or DOM nodes.
+	 * @param target The target to emit the event from
+	 * @param event The event object to emit
+	 * @return Boolean indicating Whether the event was canceled (this will always be false for event emitters)
+	 */
 	export function emit(target: EventTarget, event: EventObject): boolean;
 	export function emit(target: EventEmitter, event: EventObject): boolean;
 	export function emit(target: Evented, event: EventObject): boolean;
+	/**
+	 * Provides a normalized mechanism for listening to events from event emitters, Evented objects, or DOM nodes.
+	 * @param target Target to listen for event on
+	 * @param type Event type(s) to listen for; may be strings or extension events
+	 * @param listener Callback to handle the event when it fires
+	 * @param capture Whether the listener should be registered in the capture phase (DOM events only)
+	 * @return A handle which will remove the listener when destroy is called
+	 */
 	export default function on(target: EventTarget, type: string, listener: EventCallback, capture?: boolean): Handle;
 	export default function on(target: EventTarget, type: ExtensionEvent, listener: EventCallback, capture?: boolean): Handle;
 	export default function on(target: EventTarget, type: (string | ExtensionEvent)[], listener: EventCallback, capture?: boolean): Handle;
@@ -1236,6 +1383,22 @@ declare module 'dojo-core/string' {
 	 * @return The string, padded to the given length if necessary
 	 */
 	export function padStart(text: string, length: number, character?: string): string;
+	/**
+	 * A tag function for template strings to get the template string's raw string form.
+	 * @param callSite Call site object (or a template string in TypeScript, which will transpile to one)
+	 * @param substitutions Values to substitute within the template string (TypeScript will generate these automatically)
+	 * @return String containing the raw template string with variables substituted
+	 *
+	 * @example
+	 * // Within TypeScript; logs 'The answer is:\\n42'
+	 * let answer = 42;
+	 * console.log(string.raw`The answer is:\n${answer}`);
+	 *
+	 * @example
+	 * // The same example as above, but directly specifying a JavaScript object and substitution
+	 * console.log(string.raw({ raw: [ 'The answer is:\\n', '' ] }, 42));
+	 */
+	export function raw(callSite: TemplateStringsArray, ...substitutions: any[]): string;
 	/**
 	 * Returns a string containing the given string repeated the specified number of times.
 	 * @param text The string to repeat

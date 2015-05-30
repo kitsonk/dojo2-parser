@@ -5,9 +5,9 @@
     else if (typeof define === 'function' && define.amd) {
         define(deps, factory);
     }
-})(["require", "exports", './observers/ObjectObserver', './has'], function (require, exports) {
-    var ObjectObserver = require('./observers/ObjectObserver');
+})(["require", "exports", './has', './observers/ObjectObserver'], function (require, exports) {
     var has_1 = require('./has');
+    var ObjectObserver = require('./observers/ObjectObserver');
     var slice = Array.prototype.slice;
     var hasOwnProperty = Object.prototype.hasOwnProperty;
     function isObject(item) {
@@ -30,8 +30,8 @@
         });
     }
     function copy(kwArgs) {
-        var target;
         var sources = kwArgs.sources;
+        var target;
         if (!sources.length) {
             throw new RangeError('lang.copy requires at least one source object.');
         }
@@ -43,21 +43,18 @@
             // use the target or create a new object
             target = kwArgs.target || {};
         }
-        for (var i = 0; i < sources.length; i++) {
-            // iterate through all the sources
-            var source = sources[i];
-            var name_1 = void 0;
-            var value = void 0;
+        for (var _i = 0; _i < sources.length; _i++) {
+            var source = sources[_i];
             if (kwArgs.descriptors) {
                 // if we are copying descriptors, use to get{Own}PropertyNames so we get every property
                 // (including non enumerables).
                 var names = (kwArgs.inherited ? getPropertyNames : Object.getOwnPropertyNames)(source);
-                for (var j = 0; j < names.length; j++) {
-                    name_1 = names[j];
+                for (var _a = 0; _a < names.length; _a++) {
+                    var name_1 = names[_a];
                     // get the descriptor
                     var descriptor = (kwArgs.inherited ?
                         getPropertyDescriptor : Object.getOwnPropertyDescriptor)(source, name_1);
-                    value = descriptor.value;
+                    var value = descriptor.value;
                     if (kwArgs.deep) {
                         if (Array.isArray(value)) {
                             descriptor.value = copyArray(value, kwArgs);
@@ -79,9 +76,9 @@
             else {
                 // If we aren't using descriptors, we use a standard for-in to simplify skipping
                 // non-enumerables and inheritance. We could use Object.keys when we aren't inheriting.
-                for (name_1 in source) {
-                    if (kwArgs.inherited || hasOwnProperty.call(source, name_1)) {
-                        value = source[name_1];
+                for (var name_2 in source) {
+                    if (kwArgs.inherited || hasOwnProperty.call(source, name_2)) {
+                        var value = source[name_2];
                         if (kwArgs.deep) {
                             if (Array.isArray(value)) {
                                 value = copyArray(value, kwArgs);
@@ -95,7 +92,7 @@
                                 });
                             }
                         }
-                        target[name_1] = value;
+                        target[name_2] = value;
                     }
                 }
             }
@@ -131,17 +128,17 @@
     }
     exports.duplicate = duplicate;
     function getPropertyNames(object) {
-        var setOfNames = {};
         var names = [];
+        var setOfNames = {};
         do {
             // go through each prototype to add the property names
             var ownNames = Object.getOwnPropertyNames(object);
-            for (var i = 0, l = ownNames.length; i < l; i++) {
-                var name_2 = ownNames[i];
+            for (var _i = 0; _i < ownNames.length; _i++) {
+                var name_3 = ownNames[_i];
                 // check to make sure we haven't added it yet
-                if (setOfNames[name_2] !== true) {
-                    setOfNames[name_2] = true;
-                    names.push(name_2);
+                if (setOfNames[name_3] !== true) {
+                    setOfNames[name_3] = true;
+                    names.push(name_3);
                 }
             }
             object = Object.getPrototypeOf(object);
@@ -175,6 +172,7 @@
                 return instance[method].apply(instance, args);
             } :
             function () {
+                // TS7017
                 return instance[method].apply(instance, arguments);
             };
     }

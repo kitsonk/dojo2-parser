@@ -10,6 +10,10 @@
     var Evented = (function () {
         function Evented() {
         }
+        /**
+         * Emits an event, firing listeners registered for it.
+         * @param event The event object to emit
+         */
         Evented.prototype.emit = function (data) {
             var type = '__on' + data.type;
             var method = this[type];
@@ -17,6 +21,12 @@
                 return method.call(this, data);
             }
         };
+        /**
+         * Listens for an event, calling the listener whenever the event fires.
+         * @param type Event type to listen for
+         * @param listener Callback to handle the event when it fires
+         * @return A handle which will remove the listener when destroy is called
+         */
         Evented.prototype.on = function (type, listener) {
             var name = '__on' + type;
             if (!this[name]) {

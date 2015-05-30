@@ -5,25 +5,18 @@
     else if (typeof define === 'function' && define.amd) {
         define(deps, factory);
     }
-})(["require", "exports", './nextTick', './global', './has'], function (require, exports) {
-    var nextTick_1 = require('./nextTick');
+})(["require", "exports", './queue', './global', './has'], function (require, exports) {
+    var queue_1 = require('./queue');
     var global_1 = require('./global');
     var has_1 = require('./has');
     /**
-     * Return true if a given value meets Promise's definition of "iterable".
+     * Returns true if a given value meets Promise's definition of "iterable".
      */
     function isIterable(value) {
         return Array.isArray(value);
     }
     /**
-     * Return true if a given value has a `then` method.
-     */
-    function isThenable(value) {
-        return value && typeof value.then === 'function';
-    }
-    exports.isThenable = isThenable;
-    /**
-     * Copy an array of values, replacing any PlatformPromises in the copy with unwrapped global.Promises. This is necessary
+     * Copies an array of values, replacing any PlatformPromises in the copy with unwrapped global.Promises. This is necessary
      * for .all and .race so that the native promise doesn't treat the PlatformPromises like generic thenables.
      */
     function unwrapPromises(items) {
@@ -38,6 +31,13 @@
         }
         return unwrapped;
     }
+    /**
+     * Returns true if a given value has a `then` method.
+     */
+    function isThenable(value) {
+        return value && typeof value.then === 'function';
+    }
+    exports.isThenable = isThenable;
     /**
      * PromiseShim is an implementation of the ES2015 Promise specification.
      *
@@ -89,15 +89,6 @@
                 callbacks.push(callback);
             };
             /**
-             * Schedules a callback for execution during the next round through the event loop.
-             *
-             * @method
-             * @param callback The callback to execute on the next turn through the event loop.
-             */
-            function enqueue(callback) {
-                nextTick_1.default(callback);
-            }
-            /**
              * Settles this promise.
              *
              * @param newState The resolved state for this promise.
@@ -110,11 +101,11 @@
                 }
                 _this.state = newState;
                 _this.resolvedValue = value;
-                whenFinished = enqueue;
+                whenFinished = queue_1.queueMicroTask;
                 // Only enqueue a callback runner if there are callbacks so that initially fulfilled Promises don't have to
                 // wait an extra turn.
                 if (callbacks.length > 0) {
-                    enqueue(function () {
+                    queue_1.queueMicroTask(function () {
                         var count = callbacks.length;
                         for (var i = 0; i < count; ++i) {
                             callbacks[i].call(null);
@@ -352,7 +343,7 @@
             return this.copy(Promise.PromiseConstructor.resolve(value));
         };
         /**
-         * Copy another Promise, taking on its inner state.
+         * Copies another Promise, taking on its inner state.
          */
         Promise.copy = function (other) {
             var promise = Object.create(this.prototype, {
