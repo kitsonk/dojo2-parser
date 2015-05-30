@@ -1,4 +1,4 @@
-import core = require('./interfaces');
+import { Handle } from 'dojo-core/interfaces';
 
 function pullFromArray<T>(haystack: T[], needle: T): T[] {
 	var removed: T[] = [];
@@ -47,7 +47,7 @@ class Registry<ValueT> {
 		throw new Error('No match found');
 	}
 
-	register(test: Registry.ITest, value: ValueT, first?: boolean): core.IHandle {
+	register(test: Registry.ITest, value: ValueT, first?: boolean): Handle {
 		var entries = this._entries;
 		var entry: IEntry<ValueT> = {
 			test: test,
@@ -57,7 +57,7 @@ class Registry<ValueT> {
 		(<any> entries)[first ? 'unshift' : 'push'](entry);
 
 		return {
-			remove: function (): void {
+			destroy: function (): void {
 				this.remove = function (): void {};
 				pullFromArray(entries, entry);
 				test = value = entries = entry = null;
@@ -66,4 +66,4 @@ class Registry<ValueT> {
 	}
 }
 
-export = Registry;
+export default Registry;

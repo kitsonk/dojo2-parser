@@ -1,6 +1,6 @@
 import assert = require('intern/chai!assert');
 import registerSuite = require('intern!object');
-import Registry = require('src/Registry');
+import Registry from 'src/Registry';
 
 registerSuite({
     name: 'Registry',
