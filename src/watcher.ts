@@ -1,8 +1,6 @@
-import core = require('./interfaces');
-import nextTick from 'dojo-core/nextTick';
+import { Handle } from 'dojo-core/interfaces';
+import { queueMicroTask } from 'dojo-core/queue';
 import WeakMap from 'dojo-core/WeakMap';
-
-'use strict';
 
 interface ElementStructure {
     node: HTMLElement,
@@ -21,21 +19,21 @@ export interface WatcherRecord {
     type: WatchType
 }
 
-export interface WatcherCallback {
+export interface WatchCallback {
     (changes: WatcherRecord[]): void;
 }
 
 function clone(target: HTMLElement): ElementStructure {
     function map(list: HTMLElement[]|NodeList, iterator: IteratorCallback): ElementStructure[] {
-        var results: ElementStructure[] = [];
-        for (var i = 0; i < list.length; i++) {
+        let results: ElementStructure[] = [];
+        for (let i = 0; i < list.length; i++) {
             results[i] = iterator(<HTMLElement> list[i], i, list);
         }
         return results;
     }
 
     function copy(target: HTMLElement): ElementStructure {
-        var elementStructure: ElementStructure = {
+        let elementStructure: ElementStructure = {
             node: target
         };
         if (target.nodeType === 1) {
@@ -46,11 +44,11 @@ function clone(target: HTMLElement): ElementStructure {
     return copy(target);
 }
 
-let nodeIDCounter: number = 0;
+let nodeIDCounter = 0;
 let nodeIDWeakMap: WeakMap<any, any> = new WeakMap();
 
 function getNodeID(node: HTMLElement): string {
-    let id: string = node.id || nodeIDWeakMap.get(node);
+    let id = node.id || nodeIDWeakMap.get(node);
     if (!id) {
         nodeIDWeakMap.set(node, id = ('__node_id' + ++nodeIDCounter));
     }
@@ -87,9 +85,9 @@ function searchSubTree(changes: WatcherRecord[], target: HTMLElement, oldState: 
 
     function findMutations (node: HTMLElement, state: ElementStructure): void {
         let kids: NodeList = node.childNodes;
-        let klen: number = kids.length;
+        let klen = kids.length;
         let oldKids: ElementStructure[] = state.kids;
-        let olen: number = oldKids ? oldKids.length : 0;
+        let olen = oldKids ? oldKids.length : 0;
         let map: { [id: string] : boolean };
         let conflicts: Conflict[];
         let id: string;
@@ -97,16 +95,16 @@ function searchSubTree(changes: WatcherRecord[], target: HTMLElement, oldState: 
         let oldStructure: ElementStructure;
         let currentNode: HTMLElement;
         let oldNode: HTMLElement;
-        let numberNodesAdded: number = 0;
-        let i: number = 0;
-        let j: number = 0;
+        let numberNodesAdded = 0;
+        let i = 0;
+        let j = 0;
         while (i < klen || j < olen) {
             currentNode = <HTMLElement> kids[i];
             oldStructure = oldKids[j];
             oldNode = oldStructure && oldStructure.node;
             if (currentNode === oldNode) {
                 if (conflicts) {
-                    // resolveConflicts
+                    resolveConflicts(conflicts, kids, oldKids);
                 }
                 if (currentNode.childNodes.length || oldStructure.kids && oldStructure.kids.length) {
                     findMutations(currentNode, oldStructure);
@@ -176,7 +174,7 @@ interface ChangeDetector {
 interface NodeMapElement {
     target: HTMLElement,
     detector: ChangeDetector,
-    callback: WatcherCallback
+    callback: (changes: WatcherRecord[]) => void
 }
 
 let nodeMap: NodeMapElement[] = [];
@@ -193,7 +191,7 @@ function getChangeDetector(target: HTMLElement): ChangeDetector {
     };
 }
 
-var timer: number|NodeJS.Timer;
+let timer: number|NodeJS.Timer;
 
 function checkChanges(): void {
     timer = undefined;
@@ -201,7 +199,7 @@ function checkChanges(): void {
         let changes: WatcherRecord[] = [];
         item.detector(changes);
         if (changes.length) {
-            nextTick(() => {
+            queueMicroTask(function () {
                 item.callback(changes);
             });
         }
@@ -215,8 +213,8 @@ function startTimer(): void {
     timer = setTimeout(checkChanges, checkInterval);
 }
 
-export function watch(node: HTMLElement, callback: WatcherCallback): core.IHandle {
-    let item: NodeMapElement = {
+export default function watch(node: HTMLElement, callback: WatchCallback): Handle {
+    const item: NodeMapElement = {
         target: node,
         detector: getChangeDetector(node),
         callback: callback
@@ -226,8 +224,8 @@ export function watch(node: HTMLElement, callback: WatcherCallback): core.IHandl
         startTimer();
     }
     return {
-        remove(): void {
-            var idx = nodeMap.indexOf(item);
+        destroy(): void {
+            let idx = nodeMap.indexOf(item);
             if (~idx) {
                 nodeMap.splice(idx, 1);
             }

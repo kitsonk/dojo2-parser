@@ -1,28 +1,42 @@
 import assert = require('intern/chai!assert');
 import registerSuite = require('intern!object');
-import watcher = require('src/watcher');
-import jsdom = require('src/has!host-node?../jsdom');
+import watch, { WatcherRecord, WatchType } from 'src/watcher';
+import { jsdom } from 'src/has!host-node?../jsdom';
+import { queueMicroTask } from 'dojo-core/queue';
+import { Handle } from 'dojo-core/interfaces';
+
+let doc: Document;
 
 registerSuite({
     name: 'watcher',
+    setup: function () {
+        doc = typeof document === 'undefined' ? jsdom('<html><body></body></html>') : document;
+        doc.body.innerHTML = '';
+    },
     'basic': function () {
-        var dfd = this.async(250);
-        var doc: Document = typeof document === 'undefined' ? jsdom.jsdom('<html><body></body></html>') : document;
+        const dfd = this.async(250);
 
-        var callback = function (changes: watcher.WatcherRecord[]) {
+        let handle: Handle;
+        let div: HTMLDivElement;
+
+        const callback = function (changes: WatcherRecord[]) {
+            /* jsdom doesn't create text nodes, but other browsers do, but lets just focus on the nodes we care about */
+            changes = changes.filter(function (value: WatcherRecord) {
+                return value.node.nodeType === 1;
+            });
             assert.equal(changes.length, 3);
-            assert.equal(changes[0].type, watcher.WatchType.Added);
-            assert.equal(changes[1].type, watcher.WatchType.Added);
-            assert.equal(changes[2].type, watcher.WatchType.Added);
+            assert.equal(changes[0].type, WatchType.Added);
+            assert.equal(changes[1].type, WatchType.Added);
+            assert.equal(changes[2].type, WatchType.Added);
             assert.equal(changes[2].node, div);
-            handle.remove();
+            handle.destroy();
             doc.body.innerHTML = '';
             dfd.resolve();
         };
 
-        var handle = watcher.watch(doc.body, callback);
+        handle = watch(doc.body, callback);
         doc.body.innerHTML = '<div></div><div></div>';
-        var div = doc.createElement('div');
+        div = doc.createElement('div');
         doc.body.appendChild(div);
     }
 });
