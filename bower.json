@@ -1,6 +1,6 @@
 {
-	"name": "dojo2-parser",
-	"description": "A Dojo2 Parser",
+	"name": "dojo-parser",
+	"description": "A library that uses the DOM representations to instantiate objects",
 	"keywords": [
 		"dojo",
 		"dojo2",
@@ -12,7 +12,7 @@
 	"homepage": "http://dojotoolkit.org/",
 	"repository": {
 		"type": "git",
-		"url": "git://github.com/kitsonk/dojo2-parser.git"
+		"url": "git://github.com/kitsonk/parser.git"
 	},
 	"dependencies": {
 	},

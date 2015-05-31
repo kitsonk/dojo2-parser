@@ -1,15 +1,15 @@
 {
-	"name": "dojo2-parser",
+	"name": "dojo-parser",
 	"version": "2.0.0-pre",
-	"description": "A Dojo 2 Parser",
+	"description": "A library that uses the DOM representations to instantiate objects",
 	"homepage": "http://dojotoolkit.org",
 	"bugs": {
-		"url": "https://github.com/kitsonk/dojo2-parser/issues"
+		"url": "https://github.com/kitsonk/parser/issues"
 	},
 	"license": "BSD-3-Clause",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/kitsonk/dojo2-parser.git"
+		"url": "https://github.com/kitsonk/parser.git"
 	},
 	"devDependencies": {
 		"dts-generator": "1.4.1",
@@ -22,7 +22,7 @@
 		"grunt-tslint": "2.0.0",
 		"tslint": "2.1.1",
 		"intern": "2.2.2",
-		"typescript": "https://github.com/csnover/TypeScript/archive/0.20150422.0+378b5ffd1af2249658c8b7a3dc7465d911af93ff.tar.gz",
+		"typescript": "Arnavion/typescript-github#2015-05-23-711886e09994eda5bafa9383d92954242fc342c5",
 		"jsdom": "3.1.2"
 	}
 }
