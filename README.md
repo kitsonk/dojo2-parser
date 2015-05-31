@@ -1,4 +1,4 @@
-# dojo-parser [![Build Status](https://travis-ci.org/kitsonk/parser.png)](https://travis-ci.org/kitsonk/parser)
+# dojo-parser [![Build Status](https://travis-ci.org/kitsonk/parser.png)](https://travis-ci.org/kitsonk/parser) [![Coverage Status](https://coveralls.io/repos/kitsonk/parser/badge.svg)](https://coveralls.io/r/kitsonk/parser)
 
 ## parser
 
