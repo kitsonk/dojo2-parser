@@ -23,10 +23,25 @@ class MyClass implements ParserObject {
     id: string;
 }
 
+class OptionsClass implements ParserObject {
+    constructor (node?: HTMLElement, options?: any) {
+        if (options) {
+            this.options = options;
+        }
+    };
+    options: any;
+    node: HTMLElement;
+    id: string;
+}
+
 registerSuite({
     name: 'parser',
     setup: function () {
         doc = typeof document === 'undefined' ? jsdom('<html><body></body></html>') : document;
+    },
+
+    beforeEach: function () {
+        doc.body.innerHTML = '';
     },
 
     /* This test tests the basic parser functionality with an implied current
@@ -134,7 +149,6 @@ registerSuite({
             doc: doc
         });
 
-        doc.body.innerHTML = '';
         const watchHandle = watch(doc);
         doc.body.innerHTML = '<test3-class id="test"></test3-class>';
         const test3Class = doc.createElement('test3-class');
@@ -165,5 +179,29 @@ registerSuite({
             removeObject(objDiv);
             dfd.resolve();
         }, 100);
+    },
+
+    'attribute options': function () {
+        const handle = register('test-options', {
+            Ctor: OptionsClass,
+            doc: doc
+        });
+
+        doc.body.innerHTML = "<test-options data-options='{ \"foo\": true }'></test-options>" +
+            "<test-options data-options='{ \"foo\": \"bar\", \"baz\": 1, \"qat\": false }'></test-options>";
+
+        var div = doc.createElement('div');
+        div.setAttribute('data-options', '[ 0, 1, 2, 3 ]');
+        div.setAttribute('is', 'test-options');
+        doc.body.appendChild(div);
+
+        return parse({ root: doc }).then(function (results: OptionsClass[]) {
+            assert.equal(results.length, 3);
+            assert.deepEqual(results[0].options, { foo: true });
+            assert.deepEqual(results[1].options, { foo: 'bar', baz: 1, qat: false });
+            assert.deepEqual(results[2].options, [ 0, 1, 2, 3 ]);
+            handle.destroy();
+            results.forEach(removeObject);
+        });
     }
 });

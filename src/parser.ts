@@ -70,7 +70,6 @@ function instantiateParserObject(node: HTMLElement): ParserObject {
         }
         return obj;
     }
-    return undefined;
 }
 
 /**
