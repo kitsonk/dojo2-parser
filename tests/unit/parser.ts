@@ -1,6 +1,6 @@
 import assert = require('intern/chai!assert');
 import registerSuite = require('intern!object');
-import parse, { ParserObject, ParserResults, register, removeObject } from 'src/parser';
+import parse, { ParserObject, ParserResults, register, removeObject, watch, byId, byNode } from 'src/parser';
 import { jsdom } from 'src/has!host-node?../jsdom';
 
 interface ParserTestInterface extends ParserObject {
@@ -115,6 +115,8 @@ registerSuite({
         /* Ensure a valid constructor is in the handle */
         let obj = new handle.Ctor();
         assert.equal((<any> obj).foo, 'bar');
+        assert.equal(obj.node.tagName.toLowerCase(), 'test-class');
+        assert.isNull(obj.node.parentNode);
 
         doc.body.innerHTML = '<div is="test-class"></div>';
         return parse({ root: doc }).then(function (results: ParserResults) {
@@ -123,5 +125,45 @@ registerSuite({
             handle.destroy();
             removeObject(results[0]);
         });
+    },
+
+    '.watch()': function () {
+        const dfd = this.async(250);
+        const handle = register('test3-class', {
+            Ctor: TestClass,
+            doc: doc
+        });
+
+        doc.body.innerHTML = '';
+        const watchHandle = watch(doc);
+        doc.body.innerHTML = '<test3-class id="test"></test3-class>';
+        const test3Class = doc.createElement('test3-class');
+        doc.body.appendChild(test3Class);
+        const div = doc.createElement('div');
+        div.setAttribute('is', 'test3-class');
+        doc.body.appendChild(div);
+
+        setTimeout(function () {
+            let obj = byId('test');
+            assert(obj);
+            assert(obj.node);
+            assert.equal(obj.node.tagName.toLowerCase(), 'test3-class');
+            assert.instanceOf(obj, TestClass);
+            let objTest3Class = byNode(test3Class);
+            assert(objTest3Class);
+            assert.strictEqual(objTest3Class.node, test3Class);
+            assert.instanceOf(objTest3Class, TestClass);
+            let objDiv = byNode(div);
+            assert(objDiv);
+            assert.strictEqual(objDiv.node, div);
+            assert.instanceOf(objDiv, TestClass);
+
+            watchHandle.destroy();
+            handle.destroy();
+            removeObject(obj);
+            removeObject(objTest3Class);
+            removeObject(objDiv);
+            dfd.resolve();
+        }, 100);
     }
 });

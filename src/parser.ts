@@ -33,7 +33,7 @@ const slice = Array.prototype.slice;
 
 const parserRegistryMap: WeakMap<any, any> = new WeakMap();
 const parserNodeMap: WeakMap<any, any> = new WeakMap();
-let parserIDMap: { [id: string]: ParserObject } = {};
+const parserIDMap: { [id: string]: ParserObject } = {};
 
 /**
  * Take a HTMLElement and instantiate an Object if there is a match in the
@@ -43,13 +43,12 @@ function instantiateParserObject(node: HTMLElement): ParserObject {
     const parserRegistry = parserRegistryMap.get(node.ownerDocument);
     let Ctor: ParserObjectConstructor;
     let obj: ParserObject = parserNodeMap.get(node);
-    let optionsString: string;
     let options: {};
 
     if (parserRegistry && !obj) {
         Ctor = parserRegistry.match(node);
         if (Ctor) {
-            optionsString = node.getAttribute('data-options');
+            let optionsString = node.getAttribute('data-options');
             if (optionsString) {
                 try {
                     options = JSON.parse(optionsString);
@@ -80,16 +79,16 @@ function instantiateParserObject(node: HTMLElement): ParserObject {
  * node.
  */
 function dereferenceParserObject(obj: ParserObject): void {
-    if (obj.id && obj.id in parserIDMap) {
+    if (obj && obj.id && obj.id in parserIDMap) {
         delete parserIDMap[obj.id];
     }
-    if (obj.node) {
+    if (obj && obj.node) {
         parserNodeMap.delete(obj.node);
         obj.node = undefined;
     }
 }
 
-function observervationCallback(observations: MutationRecord[]): void {
+function observationCallback(observations: MutationRecord[]): void {
     let addedNodes: HTMLElement[];
     let removedNodes: HTMLElement[];
     observations.forEach((observation: MutationRecord) => {
@@ -126,7 +125,7 @@ export function watch(root: HTMLElement|Document = document): Handle {
         root = (<Document> root).body;
     }
     if (has('dom3-mutation-observer') && typeof observer === 'undefined') {
-        observer = new MutationObserver(observervationCallback);
+        observer = new MutationObserver(observationCallback);
         observer.observe(root, {
             childList: true,
             subtree: true
@@ -152,7 +151,14 @@ export function register(tagName: string, options: ParserDefinitionOptions): Reg
     tagName = tagName && tagName.toLowerCase();
     let Ctor: Function;
     if (!options.Ctor && options.proto) {
-        Ctor = function ParserObject() { };
+        Ctor = function (node?: HTMLElement, opts?: any): void {
+            for (let key in opts) {
+                this[key] = opts[key];
+            }
+            if (!node && !this.node) {
+                this.node = (options.doc || document).createElement(tagName);
+            }
+        };
         Ctor.prototype = <ParserObject> options.proto;
     }
     else if (options.Ctor) {
@@ -196,22 +202,22 @@ export function removeObject(obj: ParserObject): void {
     dereferenceParserObject(obj);
 }
 
-interface ParserConfig {
-    [tagName: string]: string;
+interface ParseConfig {
+    [tagName: string]: string|Function;
 }
 
-export interface ParserOptions {
+export interface ParseOptions {
     root?: HTMLElement|Document;
-    config?: ParserConfig;
+    config?: ParseConfig;
 }
 
-export default function parse(options?: ParserOptions): Promise<ParserObject[]> {
+export default function parse(options?: ParseOptions): Promise<ParserObject[]> {
     let root = options && options.root || document;
     if ('body' in root) {
         root = (<Document> root).body;
     }
-    let results: ParserObject[] = [];
-    const promise: Promise<ParserObject[]> = new Promise<ParserObject[]>(function (resolve: (value?: ParserObject[]) => void, reject: (reason?: any) => void) {
+    const results: ParserObject[] = [];
+    const promise: Promise<ParserObject[]> = new Promise<ParserObject[]>(function (resolve: (value?: ParserObject[]) => void) {
         const elements: HTMLElement[] = Array.prototype.slice.call(root.getElementsByTagName('*'));
         elements.filter((node: HTMLElement) => node.nodeType === 1).forEach(function (node: HTMLElement) {
             let parserObject = instantiateParserObject(node);
