@@ -1,4 +1,4 @@
-# dojo2-parser [![Build Status](https://travis-ci.org/kitsonk/dojo2-parser.png)](https://travis-ci.org/dojo/dojo2-parser)
+# dojo-parser [![Build Status](https://travis-ci.org/kitsonk/parser.png)](https://travis-ci.org/kitsonk/parser)
 
 ## parser
 
@@ -44,11 +44,11 @@ require('parser', function (parser) {
         }
     });
 
-    handle.remove(); // Will no longer parse tags of "test-tag"
+    handle.destroy(); // Will no longer parse tags of "test-tag"
 });
 ```
 
-### parser.watch(doc?)
+### watch(options?)
 
 Starts watching a document for any nodes being inserted or removed.  If some of
 the nodes being inserted match a registered tag name, or contain the attribute
@@ -56,13 +56,14 @@ of `is` with a value of a registered tag name, the corresponding object will be
 created and registered with the parser.
 
 If a node is being removed and there was an object created by the parser, it
-will be dereferenced in the parser's registery.
+will be dereferenced in the parser's registry.
 
-### parser.parse(doc?)
+### parse(options?)
 
-### parser.byId(id)
+### byId(id)
 
-### parser.byNode(node)
+### byNode(node)
 
+### removeObject(obj)
 
 © 2004–2015 Dojo Foundation & contributors. [New BSD](http://opensource.org/licenses/BSD-3-Clause) license.
