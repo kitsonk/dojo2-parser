@@ -107,19 +107,19 @@ module.exports = function (grunt) {
 			},
 			runner: {
 				options: {
-					reporters: [ 'runner', 'lcovhtml' ]
+					reporters: [ 'runner', 'lcovhtml', 'lcov' ]
 				}
 			},
 			local: {
 				options: {
 					config: '<%= devDirectory %>/tests/intern-local',
-					reporters: [ 'runner', 'lcovhtml' ]
+					reporters: [ 'runner', 'lcovhtml', 'lcov' ]
 				}
 			},
 			client: {
 				options: {
 					runType: 'client',
-					reporters: [ 'console', 'lcovhtml' ]
+					reporters: [ 'console', 'lcovhtml', 'lcov' ]
 				}
 			},
 			proxy: {
