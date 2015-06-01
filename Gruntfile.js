@@ -14,6 +14,7 @@ module.exports = function (grunt) {
 	grunt.loadNpmTasks('grunt-text-replace');
 	grunt.loadNpmTasks('grunt-ts');
 	grunt.loadNpmTasks('grunt-tslint');
+	grunt.loadNpmTasks('grunt-coveralls');
 	grunt.loadNpmTasks('dts-generator');
 	grunt.loadNpmTasks('intern');
 
@@ -195,6 +196,10 @@ module.exports = function (grunt) {
 			}
 		},
 
+		coveralls: {
+			src: 'lcov.info'
+		},
+
 		watch: {
 			grunt: {
 				options: {
@@ -267,6 +272,6 @@ module.exports = function (grunt) {
 	grunt.registerTask('test', [ 'dev', 'intern:client' ]);
 	grunt.registerTask('test-local', [ 'dev', 'intern:local' ]);
 	grunt.registerTask('test-proxy', [ 'dev', 'intern:proxy' ]);
-	grunt.registerTask('ci', [ 'test' ]);
+	grunt.registerTask('ci', [ 'test', 'coveralls' ]);
 	grunt.registerTask('default', [ 'clean', 'dev' ]);
 };

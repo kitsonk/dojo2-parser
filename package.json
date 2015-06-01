@@ -12,17 +12,19 @@
 		"url": "https://github.com/kitsonk/parser.git"
 	},
 	"devDependencies": {
+		"coveralls": "2.11.2",
 		"dts-generator": "1.4.1",
 		"grunt": "0.4.5",
 		"grunt-contrib-clean": "0.6.0",
 		"grunt-contrib-copy": "0.8.0",
 		"grunt-contrib-watch": "0.6.1",
+		"grunt-coveralls": "1.0.0",
 		"grunt-text-replace": "0.4.0",
 		"grunt-ts": "3.0.0",
 		"grunt-tslint": "2.0.0",
-		"tslint": "2.1.1",
 		"intern": "2.2.2",
-		"typescript": "Arnavion/typescript-github#2015-05-23-711886e09994eda5bafa9383d92954242fc342c5",
-		"jsdom": "3.1.2"
+		"jsdom": "3.1.2",
+		"tslint": "2.1.1",
+		"typescript": "Arnavion/typescript-github#2015-05-23-711886e09994eda5bafa9383d92954242fc342c5"
 	}
 }
