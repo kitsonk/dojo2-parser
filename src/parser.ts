@@ -53,9 +53,8 @@ function instantiateParserObject(node: HTMLElement): ParserObject {
                 try {
                     options = JSON.parse(optionsString);
                 }
-                catch (e) {
-                    console.log('optionsString', optionsString);
-                    console.error('Invalid data-options', e.message);
+                catch (err) {
+                    throw new SyntaxError('Invalid data-options: ' + err.message + ' in "' + optionsString + '"');
                 }
             }
             obj = new Ctor(node, options);

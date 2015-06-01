@@ -203,5 +203,31 @@ registerSuite({
             handle.destroy();
             results.forEach(removeObject);
         });
+    },
+
+    'bad options throws': function () {
+        const dfd = this.async();
+        const handle = register('test-bad-opts', {
+            Ctor: OptionsClass,
+            doc: doc
+        });
+
+        var div = doc.createElement('test-bad-opts');
+        div.setAttribute('data-options', '{ foo: bar }');
+        doc.body.appendChild(div);
+
+        parse({ root: doc }).then(function () { throw new Error('Resolved, not rejected') }, function (reason: any) {
+            assert.instanceOf(reason, SyntaxError);
+            handle.destroy();
+            dfd.resolve();
+        });
+    },
+
+    'bad registration throws': function () {
+        assert.throws(function () {
+            register('test-bad-opts', {
+                doc: doc
+            });
+        }, 'Missing either "Ctor" or "proto" in options.');
     }
 });
