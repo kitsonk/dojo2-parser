@@ -200,6 +200,10 @@ module.exports = function (grunt) {
 			src: 'lcov.info'
 		},
 
+		rewriteLcov: {
+			src: 'lcov.info'
+		},
+
 		watch: {
 			grunt: {
 				options: {
@@ -255,6 +259,16 @@ module.exports = function (grunt) {
 		}
 	});
 
+	grunt.registerMultiTask('rewriteLcov', function () {
+		var rewriteLcov = require('./_build/src/mapscript');
+		var done = this.async();
+		var lcovFileName = this.filesSrc[0];
+		rewriteLcov(lcovFileName, function (output) {
+			grunt.file.write(lcovFileName, output);
+			done();
+		});
+	});
+
 	grunt.registerTask('dev', [
 		'ts:dev',
 		'copy:staticTestFiles',
@@ -272,6 +286,6 @@ module.exports = function (grunt) {
 	grunt.registerTask('test', [ 'dev', 'intern:client' ]);
 	grunt.registerTask('test-local', [ 'dev', 'intern:local' ]);
 	grunt.registerTask('test-proxy', [ 'dev', 'intern:proxy' ]);
-	grunt.registerTask('ci', [ 'test', 'coveralls' ]);
+	grunt.registerTask('ci', [ 'test', 'rewriteLcov', 'coveralls' ]);
 	grunt.registerTask('default', [ 'clean', 'dev' ]);
 };

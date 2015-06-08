@@ -2,7 +2,7 @@
     "version": "1.5.0",
     "compilerOptions": {
         "declaration": false,
-        "module": "amd",
+        "module": "umd",
         "noImplicitAny": true,
         "outDir": "_build/",
         "removeComments": false,
@@ -21,6 +21,7 @@
         "./src/Registry.ts",
         "./src/has.ts",
         "./src/loader.ts",
+        "./src/mapscript.ts",
         "./src/node.ts",
         "./src/parser.ts",
         "./src/watcher.ts",
