@@ -234,7 +234,7 @@ function remap(lcovRecord: LcovRecord, src: string[], smc: sourceMap.SourceMapCo
         item.originalLine = originalPosition.line;
         return item;
     });
-    lcovRecord.sourceFile = source;
+    lcovRecord.sourceFile = source.replace('../../', '');
 
     /* Couldn't ensure coverage report matches original source file */
     if (funcPos.length !== lcovRecord.functions.length) {
