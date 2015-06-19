@@ -22,10 +22,10 @@
 		"grunt-text-replace": "0.4.0",
 		"grunt-ts": "3.0.0",
 		"grunt-tslint": "2.0.0",
-		"intern": "2.2.2",
+		"intern": "theintern/intern#master",
 		"jsdom": "3.1.2",
 		"source-map": "0.4.2",
 		"tslint": "2.1.1",
-		"typescript": "Arnavion/typescript-github#2015-05-23-711886e09994eda5bafa9383d92954242fc342c5"
+		"typescript": "Microsoft/TypeScript#release-1.5"
 	}
 }

@@ -120,7 +120,11 @@ module.exports = function (grunt) {
 			client: {
 				options: {
 					runType: 'client',
-					reporters: [ 'console', 'lcovhtml', 'lcov' ]
+					reporters: [
+						{ id: 'Console' },
+						{ id: 'LcovHtml', directory: 'html-report' },
+						{ id: 'Lcov', filename: 'lcov.info' }
+					]
 				}
 			},
 			proxy: {
