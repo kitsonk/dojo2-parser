@@ -22,10 +22,10 @@
 		"grunt-text-replace": "0.4.0",
 		"grunt-ts": "3.0.0",
 		"grunt-tslint": "2.0.0",
-		"intern": "theintern/intern#master",
-		"jsdom": "3.1.2",
+		"intern": "theintern/intern#05779ab7adc1f5e57b7a1e6c3428b2db97da1845",
+		"jsdom": "5.4.3",
 		"source-map": "0.4.2",
 		"tslint": "2.1.1",
-		"typescript": "Microsoft/TypeScript#release-1.5"
+		"typescript": "Microsoft/TypeScript#331b63df7d05c9476b6b9cae97a7a158eba303ca"
 	}
 }
