@@ -206,7 +206,9 @@ module.exports = function (grunt) {
 		},
 
 		cover_ts: {
-			src: 'lcov.info'
+			files: {
+				src: 'lcov.info'
+			}
 		},
 
 		watch: {
@@ -262,16 +264,6 @@ module.exports = function (grunt) {
 			grunt.file.write('tsconfig.json', output);
 			tsconfigContent = output;
 		}
-	});
-
-	grunt.registerMultiTask('rewriteLcov', function () {
-		var rewriteLcov = require('./_build/src/mapscript');
-		var done = this.async();
-		var lcovFileName = this.filesSrc[0];
-		rewriteLcov(lcovFileName, function (output) {
-			grunt.file.write(lcovFileName, output);
-			done();
-		});
 	});
 
 	grunt.registerTask('dev', [
