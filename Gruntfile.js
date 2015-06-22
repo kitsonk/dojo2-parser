@@ -15,6 +15,7 @@ module.exports = function (grunt) {
 	grunt.loadNpmTasks('grunt-ts');
 	grunt.loadNpmTasks('grunt-tslint');
 	grunt.loadNpmTasks('grunt-coveralls');
+	grunt.loadNpmTasks('grunt-cover-ts');
 	grunt.loadNpmTasks('dts-generator');
 	grunt.loadNpmTasks('intern');
 
@@ -62,7 +63,7 @@ module.exports = function (grunt) {
 				}
 			},
 			coverage: {
-				src: [ 'html-report/' ]
+				src: [ 'html-report/', 'lcov.info' ]
 			}
 		},
 
@@ -204,7 +205,7 @@ module.exports = function (grunt) {
 			src: 'lcov.info'
 		},
 
-		rewriteLcov: {
+		cover_ts: {
 			src: 'lcov.info'
 		},
 
@@ -290,6 +291,6 @@ module.exports = function (grunt) {
 	grunt.registerTask('test', [ 'dev', 'intern:client' ]);
 	grunt.registerTask('test-local', [ 'dev', 'intern:local' ]);
 	grunt.registerTask('test-proxy', [ 'dev', 'intern:proxy' ]);
-	grunt.registerTask('ci', [ 'test', 'rewriteLcov', 'coveralls' ]);
+	grunt.registerTask('ci', [ 'test', 'cover_ts', 'coveralls' ]);
 	grunt.registerTask('default', [ 'clean', 'dev' ]);
 };

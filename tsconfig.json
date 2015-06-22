@@ -21,7 +21,6 @@
         "./src/Registry.ts",
         "./src/has.ts",
         "./src/loader.ts",
-        "./src/mapscript.ts",
         "./src/node.ts",
         "./src/parser.ts",
         "./src/watcher.ts",
