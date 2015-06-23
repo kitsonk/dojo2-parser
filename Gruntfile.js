@@ -7,6 +7,8 @@ function mixin(destination, source) {
 	return destination;
 }
 
+var sendToCodeCov = require('codecov.io').handleInput;
+
 module.exports = function (grunt) {
 	grunt.loadNpmTasks('grunt-contrib-clean');
 	grunt.loadNpmTasks('grunt-contrib-copy');
@@ -205,6 +207,10 @@ module.exports = function (grunt) {
 			src: 'lcov.info'
 		},
 
+		codecov_io: {
+			src: 'lcov.info'
+		},
+
 		cover_ts: {
 			files: {
 				src: 'lcov.info'
@@ -228,6 +234,19 @@ module.exports = function (grunt) {
 				]
 			}
 		}
+	});
+
+	grunt.registerMultiTask('codecov_io', function () {
+		this.filesSrc.forEach(function (file) {
+			sendToCodeCov(grunt.file.read(file), function (err) {
+				if (err) {
+					console.log('error sending to codecov.io', err, err.stack);
+					if (/non-success response/.test(err.message)) {
+						console.log('detail: ', err.detail);
+					}
+				}
+			})
+		});
 	});
 
 	grunt.registerMultiTask('rewriteSourceMaps', function () {
@@ -283,6 +302,6 @@ module.exports = function (grunt) {
 	grunt.registerTask('test', [ 'dev', 'intern:client' ]);
 	grunt.registerTask('test-local', [ 'dev', 'intern:local' ]);
 	grunt.registerTask('test-proxy', [ 'dev', 'intern:proxy' ]);
-	grunt.registerTask('ci', [ 'test', 'cover_ts', 'coveralls' ]);
+	grunt.registerTask('ci', [ 'test', 'cover_ts', 'codecov_io' ]);
 	grunt.registerTask('default', [ 'clean', 'dev' ]);
 };
