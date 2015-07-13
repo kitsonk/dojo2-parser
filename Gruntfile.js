@@ -213,7 +213,7 @@ module.exports = function (grunt) {
 		},
 
 		exec: {
-			codecov: 'cat coverage-final.json | ./node_modules/codecov.io/bin/codecov.io.js'
+			codecov: 'cat lcov.info | ./node_modules/codecov.io/bin/codecov.io.js'
 		},
 
 		watch: {
