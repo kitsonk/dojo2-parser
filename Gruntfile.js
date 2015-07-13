@@ -13,6 +13,7 @@ module.exports = function (grunt) {
 	grunt.loadNpmTasks('grunt-contrib-clean');
 	grunt.loadNpmTasks('grunt-contrib-copy');
 	grunt.loadNpmTasks('grunt-contrib-watch');
+	grunt.loadNpmTasks('grunt-exec');
 	grunt.loadNpmTasks('grunt-text-replace');
 	grunt.loadNpmTasks('grunt-ts');
 	grunt.loadNpmTasks('grunt-tslint');
@@ -211,6 +212,10 @@ module.exports = function (grunt) {
 			src: 'lcov.info'
 		},
 
+		exec: {
+			codecov: 'cat coverage-final.json | ./node_modules/codecov.io/bin/codecov.io.js'
+		},
+
 		watch: {
 			grunt: {
 				options: {
@@ -298,6 +303,6 @@ module.exports = function (grunt) {
 	grunt.registerTask('test', [ 'dev', 'intern:client' ]);
 	grunt.registerTask('test-local', [ 'dev', 'intern:local' ]);
 	grunt.registerTask('test-proxy', [ 'dev', 'intern:proxy' ]);
-	grunt.registerTask('ci', [ 'test', 'codecov_io' ]);
+	grunt.registerTask('ci', [ 'test', 'exec:codecov' ]);
 	grunt.registerTask('default', [ 'clean', 'dev' ]);
 };
