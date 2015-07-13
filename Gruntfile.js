@@ -234,9 +234,11 @@ module.exports = function (grunt) {
 		this.filesSrc.forEach(function (file) {
 			sendToCodeCov(grunt.file.read(file), function (err) {
 				if (err) {
-					console.log('error sending to codecov.io', err, err.stack);
+					grunt.log.error('error sending to codecov.io');
+					grunt.log.errorlns(err);
+					grunt.log.errorlns(err.stack);
 					if (/non-success response/.test(err.message)) {
-						console.log('detail: ', err.detail);
+						grunt.log.error('detail: ' + err.detail);
 					}
 				}
 			})
@@ -296,6 +298,6 @@ module.exports = function (grunt) {
 	grunt.registerTask('test', [ 'dev', 'intern:client' ]);
 	grunt.registerTask('test-local', [ 'dev', 'intern:local' ]);
 	grunt.registerTask('test-proxy', [ 'dev', 'intern:proxy' ]);
-	grunt.registerTask('ci', [ 'test', 'coveralls', 'codecov_io' ]);
+	grunt.registerTask('ci', [ 'test', 'codecov_io' ]);
 	grunt.registerTask('default', [ 'clean', 'dev' ]);
 };
