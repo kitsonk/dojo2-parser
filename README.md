@@ -1,6 +1,6 @@
 # dojo-parser
 
-[![Build Status](https://travis-ci.org/kitsonk/parser.png)](https://travis-ci.org/kitsonk/parser) [![Coverage Status](https://coveralls.io/repos/kitsonk/parser/badge.svg?branch=master)](https://coveralls.io/r/kitsonk/parser?branch=master)
+[![Build Status](https://travis-ci.org/kitsonk/parser.png)](https://travis-ci.org/kitsonk/parser) [![codecov.io](http://codecov.io/github/kitsonk/parser/coverage.svg?branch=master)](http://codecov.io/github/kitsonk/parser?branch=master)
 
 ## parser
 
