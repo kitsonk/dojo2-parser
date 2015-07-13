@@ -126,7 +126,8 @@ module.exports = function (grunt) {
 					reporters: [
 						{ id: 'Console' },
 						{ id: 'LcovHtml', directory: 'html-report' },
-						{ id: 'Lcov', filename: 'lcov.info' }
+						{ id: 'Lcov' },
+						{ id: 'JsonCoverage' }
 					]
 				}
 			},
