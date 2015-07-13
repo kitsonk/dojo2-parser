@@ -24,7 +24,7 @@
 		"grunt-text-replace": "0.4.0",
 		"grunt-ts": "3.0.0",
 		"grunt-tslint": "2.0.0",
-		"intern": "kitsonk/intern#c866e38626332a3c192745bf4c57caabd77042dd",
+		"intern": "kitsonk/intern#c38d431c8cc2533850f62b039a742c1ab93749be",
 		"jsdom": "5.4.3",
 		"tslint": "2.1.1",
 		"typescript": "Microsoft/TypeScript#331b63df7d05c9476b6b9cae97a7a158eba303ca"

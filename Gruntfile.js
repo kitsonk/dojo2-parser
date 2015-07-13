@@ -111,7 +111,12 @@ module.exports = function (grunt) {
 			},
 			runner: {
 				options: {
-					reporters: [ 'runner', 'lcovhtml', 'lcov' ]
+					reporters: [
+						{ id: 'Console' },
+						{ id: 'LcovHtml', directory: 'html-report' },
+						{ id: 'Lcov' },
+						{ id: 'JsonCoverage' }
+					]
 				}
 			},
 			local: {
@@ -300,7 +305,7 @@ module.exports = function (grunt) {
 		'copy:staticFiles',
 		'dtsGenerator:dist'
 	]);
-	grunt.registerTask('test', [ 'dev', 'intern:client' ]);
+	grunt.registerTask('test', [ 'dev', 'intern:client', 'intern:runner' ]);
 	grunt.registerTask('test-local', [ 'dev', 'intern:local' ]);
 	grunt.registerTask('test-proxy', [ 'dev', 'intern:proxy' ]);
 	grunt.registerTask('ci', [ 'test', 'exec:codecov' ]);
