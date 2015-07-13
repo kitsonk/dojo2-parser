@@ -1,6 +1,6 @@
 import assert = require('intern/chai!assert');
 import registerSuite = require('intern!object');
-import parse, { ParserObject, ParserResults, register, removeObject, watch, byId, byNode } from 'src/parser';
+import parse, { ParserObject, ParserResults, RegistrationHandle, register, removeObject, watch, byId, byNode } from 'src/parser';
 import { jsdom } from 'src/has!host-node?../jsdom';
 
 interface ParserTestInterface extends ParserObject {
@@ -128,7 +128,7 @@ registerSuite({
         });
 
         /* Ensure a valid constructor is in the handle */
-        let obj = new handle.Ctor();
+        let obj = new (<RegistrationHandle> handle).Ctor();
         assert.equal((<any> obj).foo, 'bar');
         assert.equal(obj.node.tagName.toLowerCase(), 'test-class');
         assert.isNull(obj.node.parentNode);

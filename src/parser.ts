@@ -145,8 +145,22 @@ export function watch(root: HTMLElement|Document = document): Handle {
     };
 }
 
-export function register(tagName: string, options: ParserDefinitionOptions): RegistrationHandle {
-    tagName = tagName && tagName.toLowerCase();
+interface RegistrationOptions {
+    [tagName: string]: ParserDefinitionOptions;
+}
+
+interface RegistrationArrayHandle extends Handle {
+    Ctors: ParserObjectConstructor[];
+}
+
+export function register(options: RegistrationOptions): RegistrationHandle|RegistrationArrayHandle;
+export function register(tagName: string, options: ParserDefinitionOptions): RegistrationHandle|RegistrationArrayHandle;
+export function register(tagName: string|RegistrationOptions, options?: ParserDefinitionOptions): RegistrationHandle|RegistrationArrayHandle {
+    if (typeof tagName === 'object') {
+        options = tagName;
+        tagName = '';
+    }
+    tagName = tagName && (<string> tagName).toLowerCase();
     let Ctor: Function;
     if (!options.Ctor && options.proto) {
         Ctor = function (node?: HTMLElement, opts?: any): void {
@@ -154,7 +168,7 @@ export function register(tagName: string, options: ParserDefinitionOptions): Reg
                 this[key] = opts[key];
             }
             if (!node && !this.node) {
-                this.node = (options.doc || document).createElement(tagName);
+                this.node = (options.doc || document).createElement(<string> tagName);
             }
         };
         Ctor.prototype = <ParserObject> options.proto;
