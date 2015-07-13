@@ -9,28 +9,27 @@ export var proxyUrl = 'http://localhost:9000/';
 // https://saucelabs.com/docs/additional-config#desired-capabilities for Sauce Labs capabilities.
 // Note that the `build` capability will be filled in with the current commit ID from the Travis CI environment
 // automatically
-export var capabilities = {
-	'selenium-version': '2.45.0'
+export let capabilities = {
+	'selenium-version': '2.43.0',
+	'idle-timeout': 30
 };
 
 // Browsers to run integration testing against. Note that version numbers must be strings if used with Sauce
 // OnDemand. Options that will be permutated are browserName, version, platform, and platformVersion; any other
 // capabilities options specified for an environment will be copied as-is
-export var environments = [
-	{ browserName: 'internet explorer', version: '11', platform: 'Windows 8.1' },
-	{ browserName: 'internet explorer', version: '10', platform: 'Windows 8' },
-	{ browserName: 'internet explorer', version: [ '9', '10' ], platform: 'Windows 7' },
-	{ browserName: 'firefox', version: '36', platform: [ 'OS X 10.9', 'Windows 7', 'Windows XP', 'Linux' ] },
-	{ browserName: 'chrome', version: '', platform: [ 'Linux', 'OS X 10.9', 'Windows XP', 'Windows 7', 'Windows 8', 'Windows 8.1' ] },
-	{ browserName: 'safari', version: '6', platform: 'OS X 10.8' }/*,
-	{ browserName: 'safari', version: '7', platform: 'OS X 10.9' }*/
+export let environments = [
+	{ browserName: 'internet explorer', version: '11', platform: 'WIN8', fixSessionCapabilities: false },
+	{ browserName: 'internet explorer', version: '10', platform: 'WIN8', fixSessionCapabilities: false },
+	{ browserName: 'internet explorer', version: '9', platform: 'WINDOWS', fixSessionCapabilities: false },
+	{ browserName: 'firefox', version: '33', platform: [ 'WINDOWS', 'MAC' ], fixSessionCapabilities: false },
+	{ browserName: 'chrome', version: '38', platform: [ 'WINDOWS', 'MAC' ], fixSessionCapabilities: false }
 ];
 
 // Maximum number of simultaneous integration tests that should be executed on the remote WebDriver service
-export var maxConcurrency = 3;
+export let maxConcurrency = 1;
 
 // Name of the tunnel class to use for WebDriver tests
-export var tunnel = 'SauceLabsTunnel';
+export var tunnel = 'BrowserStackTunnel';
 
 // Configuration options for the module loader; any AMD configuration options supported by the specified AMD loader
 // can be used here
