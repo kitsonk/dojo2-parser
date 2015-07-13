@@ -208,7 +208,7 @@ module.exports = function (grunt) {
 		},
 
 		codecov_io: {
-			src: 'coverage-final.json'
+			src: 'lcov.info'
 		},
 
 		watch: {
