@@ -312,10 +312,10 @@ module.exports = function (grunt) {
 		'copy:staticFiles',
 		'dtsGenerator:dist'
 	]);
-	grunt.registerTask('test', [ 'dev', 'intern:client', 'map_coverage_json' ]);
+	grunt.registerTask('test', [ 'dev', 'intern:client' ]);
 	grunt.registerTask('test-runner', [ 'dev', 'intern:runner' ]);
 	grunt.registerTask('test-local', [ 'dev', 'intern:local' ]);
 	grunt.registerTask('test-proxy', [ 'dev', 'intern:proxy' ]);
-	grunt.registerTask('ci', [ 'test', 'test-runner', 'exec:codecov' ]);
+	grunt.registerTask('ci', [ 'test', 'test-runner', 'map_coverage_json', 'exec:codecov' ]);
 	grunt.registerTask('default', [ 'clean', 'dev' ]);
 };
