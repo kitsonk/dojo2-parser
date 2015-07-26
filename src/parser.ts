@@ -35,10 +35,6 @@ const parserRegistryMap: WeakMap<any, any> = new WeakMap();
 const parserNodeMap: WeakMap<any, any> = new WeakMap();
 const parserIDMap: { [id: string]: ParserObject } = {};
 
-/**
- * Take a HTMLElement and instantiate an Object if there is a match in the
- * registry and the Object doesn't appear to be instantiated yet.
- */
 function instantiateParserObject(node: HTMLElement): ParserObject {
     const parserRegistry = parserRegistryMap.get(node.ownerDocument);
     let Ctor: ParserObjectConstructor;
@@ -71,11 +67,6 @@ function instantiateParserObject(node: HTMLElement): ParserObject {
     }
 }
 
-/**
- * Determine if a parser object is in either of the maps and remove it, allowing
- * Garbage Collection to potentially occur for the object and the associated DOM
- * node.
- */
 function dereferenceParserObject(obj: ParserObject): void {
     if (obj && obj.id && obj.id in parserIDMap) {
         delete parserIDMap[obj.id];

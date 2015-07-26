@@ -19,6 +19,7 @@
         "./typings/tsd.d.ts",
         "./_modules/dojo-core/_typings/dojo-core/dojo-core-2.0.0-pre.d.ts",
         "./src/Registry.ts",
+        "./src/composer.ts",
         "./src/has.ts",
         "./src/loader.ts",
         "./src/node.ts",

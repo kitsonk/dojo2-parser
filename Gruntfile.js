@@ -18,6 +18,7 @@ module.exports = function (grunt) {
 	grunt.loadNpmTasks('grunt-ts');
 	grunt.loadNpmTasks('grunt-tslint');
 	grunt.loadNpmTasks('grunt-coveralls');
+	grunt.loadNpmTasks('grunt-cover-ts');
 	grunt.loadNpmTasks('dts-generator');
 	grunt.loadNpmTasks('intern');
 
@@ -129,7 +130,7 @@ module.exports = function (grunt) {
 				options: {
 					runType: 'client',
 					reporters: [
-						{ id: 'Console' },
+						{ id: 'Pretty' },
 						{ id: 'LcovHtml', directory: 'html-report' },
 						{ id: 'Lcov' },
 						{ id: 'JsonCoverage' }
@@ -214,7 +215,13 @@ module.exports = function (grunt) {
 		},
 
 		codecov_io: {
-			src: 'lcov.info'
+			src: 'coverage-final.json'
+		},
+
+		map_coverage_json: {
+			files: {
+				src: 'coverage-final.json'
+			}
 		},
 
 		exec: {
@@ -305,7 +312,7 @@ module.exports = function (grunt) {
 		'copy:staticFiles',
 		'dtsGenerator:dist'
 	]);
-	grunt.registerTask('test', [ 'dev', 'intern:client' ]);
+	grunt.registerTask('test', [ 'dev', 'intern:client', 'map_coverage_json' ]);
 	grunt.registerTask('test-runner', [ 'dev', 'intern:runner' ]);
 	grunt.registerTask('test-local', [ 'dev', 'intern:local' ]);
 	grunt.registerTask('test-proxy', [ 'dev', 'intern:proxy' ]);
