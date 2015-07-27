@@ -113,7 +113,7 @@ module.exports = function (grunt) {
 			runner: {
 				options: {
 					reporters: [
-						{ id: 'Pretty' },
+						{ id: 'Console' },
 						{ id: 'LcovHtml', directory: 'html-report' },
 						{ id: 'Lcov' },
 						{ id: 'JsonCoverage' }
@@ -225,7 +225,7 @@ module.exports = function (grunt) {
 		},
 
 		exec: {
-			codecov: 'cat lcov.info | ./node_modules/codecov.io/bin/codecov.io.js'
+			codecov: 'cat coverage-final.json | ./node_modules/codecov.io/bin/codecov.io.js'
 		},
 
 		watch: {
