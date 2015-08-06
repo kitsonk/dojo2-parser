@@ -224,6 +224,19 @@ module.exports = function (grunt) {
 			}
 		},
 
+		map_coverage: {
+			options: {
+				reports: {
+					'json': 'coverage-final.json',
+					'lcovonly': 'lcov.info',
+					'html': 'html-report'
+				}
+			},
+			files: {
+				src: 'coverage-final.json'
+			}
+		},
+
 		exec: {
 			codecov: 'cat coverage-final.json | ./node_modules/codecov.io/bin/codecov.io.js'
 		},
@@ -258,7 +271,7 @@ module.exports = function (grunt) {
 						grunt.log.error('detail: ' + err.detail);
 					}
 				}
-			})
+			});
 		});
 	});
 
@@ -312,10 +325,10 @@ module.exports = function (grunt) {
 		'copy:staticFiles',
 		'dtsGenerator:dist'
 	]);
-	grunt.registerTask('test', [ 'dev', 'intern:client', 'map_coverage_json' ]);
-	grunt.registerTask('test-runner', [ 'dev', 'intern:runner', 'map_coverage_json' ]);
+	grunt.registerTask('test', [ 'dev', 'intern:client', 'map_coverage' ]);
+	grunt.registerTask('test-runner', [ 'dev', 'intern:runner' ]);
 	grunt.registerTask('test-local', [ 'dev', 'intern:local' ]);
 	grunt.registerTask('test-proxy', [ 'dev', 'intern:proxy' ]);
-	grunt.registerTask('ci', [ 'test', 'test-runner', 'exec:codecov' ]);
+	grunt.registerTask('ci', [ 'test', 'test-runner', 'map_coverage', 'exec:codecov' ]);
 	grunt.registerTask('default', [ 'clean', 'dev' ]);
 };

@@ -10,7 +10,7 @@ export var proxyUrl = 'http://localhost:9000/';
 // Note that the `build` capability will be filled in with the current commit ID from the Travis CI environment
 // automatically
 export let capabilities = {
-	'selenium-version': '2.43.0',
+	'selenium-version': '2.46.0',
 	'idle-timeout': 30
 };
 
