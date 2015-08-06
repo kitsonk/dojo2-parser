@@ -66,7 +66,7 @@ module.exports = function (grunt) {
 				}
 			},
 			coverage: {
-				src: [ 'html-report/', 'lcov.info' ]
+				src: [ 'html-report/', 'lcov.info', 'coverage-final.json' ]
 			}
 		},
 
@@ -114,8 +114,6 @@ module.exports = function (grunt) {
 				options: {
 					reporters: [
 						{ id: 'Console' },
-						{ id: 'LcovHtml', directory: 'html-report' },
-						{ id: 'Lcov' },
 						{ id: 'JsonCoverage' }
 					]
 				}
@@ -131,8 +129,6 @@ module.exports = function (grunt) {
 					runType: 'client',
 					reporters: [
 						{ id: 'Pretty' },
-						{ id: 'LcovHtml', directory: 'html-report' },
-						{ id: 'Lcov' },
 						{ id: 'JsonCoverage' }
 					]
 				}
